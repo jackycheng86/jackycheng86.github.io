@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <title>jackycheng86小站</title>
+ <link href="http://localhost:4000/atom.xml" rel="self"/>
+ <link href="http://localhost:4000"/>
+ <updated>2017-12-22T16:04:16+08:00</updated>
+ <id>http://localhost:4000</id>
+ <author>
+   <name>jacky</name>
+   <email>359202057@qq.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>Spring Boot初体验</title>
+   <link href="http://localhost:4000/spring/2017/10/05/Spring-Boot%E5%88%9D%E4%BD%93%E9%AA%8C/"/>
+   <updated>2017-10-05T07:29:53+08:00</updated>
+   <id>http://localhost:4000/spring/2017/10/05/Spring Boot初体验</id>
+   <content type="html">&lt;p&gt;我记得在spring boot出来之前做框架整合是一件非常不愉快的事情，各种jar包版本冲突是非常糟糕的体验，同时那时候主要还是通过xml文件来进行配置，各种配置文件十分繁多，hibernate需要，spring需要，如果用struts还需要，总之就是一个及其麻烦的事情。
+当我第一次见到spring boot的时候我们被惊艳到了，原来开发可以如此的流畅，真正的约定大于配置，各种方便的注解，包整合十分愉快。
+这篇文章就是简单记录一下利用最简单的spring boot快速开发一个web小应用。&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;开发环境spring boot + maven&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;开发环境自己配置（jdk+maven）
+##spring boot初始化
+首先你可以到spring官网去初始化项目https://start.spring.io/ ，在这里可以针对你自己的应用场景进行配置，同时选择整合你需要的各种包，最后再下载下来用你习惯的开发工具打开即可。
+简单看看我自己的pom.xml文件&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;groupId&amp;gt;com.material&amp;lt;/groupId&amp;gt;
+	&amp;lt;artifactId&amp;gt;data&amp;lt;/artifactId&amp;gt;
+	&amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+	&amp;lt;packaging&amp;gt;war&amp;lt;/packaging&amp;gt;
+
+	&amp;lt;name&amp;gt;data&amp;lt;/name&amp;gt;
+	&amp;lt;description&amp;gt;Demo project for Spring Boot&amp;lt;/description&amp;gt;
+
+	&amp;lt;parent&amp;gt;
+		&amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+		&amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+		&amp;lt;version&amp;gt;1.5.2.RELEASE&amp;lt;/version&amp;gt;
+		&amp;lt;relativePath/&amp;gt; &amp;lt;!-- lookup parent from repository --&amp;gt;
+	&amp;lt;/parent&amp;gt;
+
+	&amp;lt;properties&amp;gt;
+		&amp;lt;project.build.sourceEncoding&amp;gt;UTF-8&amp;lt;/project.build.sourceEncoding&amp;gt;
+		&amp;lt;project.reporting.outputEncoding&amp;gt;UTF-8&amp;lt;/project.reporting.outputEncoding&amp;gt;
+		&amp;lt;java.version&amp;gt;1.8&amp;lt;/java.version&amp;gt;
+	&amp;lt;/properties&amp;gt;
+
+	&amp;lt;dependencies&amp;gt;
+		&amp;lt;dependency&amp;gt;
+			&amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+			&amp;lt;artifactId&amp;gt;spring-boot-starter-data-jpa&amp;lt;/artifactId&amp;gt;
+		&amp;lt;/dependency&amp;gt;
+		&amp;lt;dependency&amp;gt;
+			&amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+			&amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+		&amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-cache&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+		&amp;lt;dependency&amp;gt;
+			&amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+			&amp;lt;artifactId&amp;gt;spring-boot-starter-tomcat&amp;lt;/artifactId&amp;gt;
+			&amp;lt;scope&amp;gt;provided&amp;lt;/scope&amp;gt;
+		&amp;lt;/dependency&amp;gt;
+		&amp;lt;dependency&amp;gt;
+			&amp;lt;groupId&amp;gt;com.google.guava&amp;lt;/groupId&amp;gt;
+			&amp;lt;artifactId&amp;gt;guava&amp;lt;/artifactId&amp;gt;
+			&amp;lt;version&amp;gt;19.0&amp;lt;/version&amp;gt;
+		&amp;lt;/dependency&amp;gt;
+		&amp;lt;dependency&amp;gt;
+			&amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+			&amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+			&amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+		&amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.apache.tomcat.embed&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;tomcat-embed-jasper&amp;lt;/artifactId&amp;gt;
+            &amp;lt;scope&amp;gt;provided&amp;lt;/scope&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.oracle&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;ojdbc6&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;11.2.0.4&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;javax.servlet&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;jstl&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;1.2&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;druid&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;1.0.25&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-devtools&amp;lt;/artifactId&amp;gt;
+            &amp;lt;optional&amp;gt;true&amp;lt;/optional&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;因为个人比较习惯jsp所以页面就没有采用其他的模板技术，因此我的application.properties文件配置如下&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;spring.freemarker.checkTemplateLocation: false
+spring.mvc.view.prefix: /WEB-INF/jsp/
+spring.mvc.view.suffix: .jsp
+spring.mvc.locale: zh_CN
+spring.http.encoding.charset: UTF-8
+spring.http.encoding.enabled: true
+spring.http.encoding.force: true
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;同时在src目录下添加一个webapp目录，再在webapp目录下添加 /WEB-INF/jsp/，与各配置文件目录对应&lt;/p&gt;
+
+&lt;p&gt;自己添加了applcationContext.xml文件用于提供对一些静态文件的访问&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;context:property-placeholder location=&quot;classpath:application.properties,classpath:config.properties&quot;/&amp;gt;
+    &amp;lt;!-- 静态资源访问 --&amp;gt;
+    &amp;lt;mvc:resources mapping=&quot;/js/**&quot; location=&quot;/WEB-INF/js/&quot;/&amp;gt;
+    &amp;lt;mvc:resources mapping=&quot;/img/**&quot; location=&quot;/WEB-INF/img/&quot;/&amp;gt;
+    &amp;lt;mvc:resources mapping=&quot;/css/**&quot; location=&quot;/WEB-INF/css/&quot;/&amp;gt;
+    &amp;lt;mvc:resources mapping=&quot;/assets/**&quot; location=&quot;/WEB-INF/assets/&quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;##各类配置
+通过spring官网会默认帮你生成两个类&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@EnableAutoConfiguration
+@SpringBootApplication
+@ComponentScan
+@ServletComponentScan
+@EnableCaching
+public class MaterialApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(MaterialApplication.class, args);
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@Configuration
+@ImportResource({&quot;classpath:applicationContext.xml&quot;})
+public class ServletInitializer extends SpringBootServletInitializer {
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(MaterialApplication.class);
+    }
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;具体的注解我也就不详细描述了，百度很多也很详细
+通过上面的一系列配置我们就搭建好了一个基本的基于spring boot的web应用&lt;/p&gt;
+
+&lt;p&gt;##定义controller和jsp
+在完成配置的基础上我们会定义自己的Controller以及jsp页面
+controller类&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@Controller
+public class HelloController {
+
+    @RequestMapping(&quot;/hello&quot;)
+    public String greeting(@RequestParam(value=&quot;name&quot;, required=false, defaultValue=&quot;World&quot;) String name, Model model) {
+        model.addAttribute(&quot;name&quot;, name);
+        return &quot;hello&quot;;
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;jsp页面&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;%@&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;page&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;language=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;java&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;contentType=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;text/html;charset=utf-8&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;%@&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;taglib&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;prefix=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;spring&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;uri=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.springframework.org/tags&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;%@&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;taglib&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;prefix=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;c&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;uri=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://java.sun.com/jsp/jstl/core&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;head&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;title&amp;gt;&lt;/span&gt;Hello World&lt;span class=&quot;nt&quot;&gt;&amp;lt;/title&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/head&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+Hello,${name}
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;下一步就是进入命令行，从命令行进入项目目录然后用maven启动项目&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;mvn spring-boot:run&lt;/p&gt;
+&lt;/blockquote&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Gentoo安装配置</title>
+   <link href="http://localhost:4000/gentoo/2017/10/05/Gentoo%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/"/>
+   <updated>2017-10-05T07:29:53+08:00</updated>
+   <id>http://localhost:4000/gentoo/2017/10/05/Gentoo安装配置</id>
+   <content type="html">&lt;h1 id=&quot;gentoo安装过程&quot;&gt;Gentoo安装过程&lt;/h1&gt;
+&lt;p&gt;##（一) 磁盘准备&lt;/p&gt;
+&lt;h3 id=&quot;1硬盘分区&quot;&gt;1、硬盘分区&lt;/h3&gt;
+&lt;p&gt;通过cfdisk分区工具将硬盘进行分区操作，总计分为4个区如下所示&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;/deve/sda1	efi 分区&lt;/p&gt;
+
+  &lt;p&gt;/dev/sda2	swap 分区&lt;/p&gt;
+
+  &lt;p&gt;/dev/sda3	root 分区&lt;/p&gt;
+
+  &lt;p&gt;/dev/sda4	home 分区&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;2格式化分区&quot;&gt;2、格式化分区&lt;/h3&gt;
+
+&lt;p&gt;对已经完成分区的磁盘进行格式化，其中对efi分区执行vfat格式化，root分区和home分区分别个是化为ext4格式，创建swap分区并启用，具体如下代码&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkfs.vfat /dev/sda1
+mkswap /dev/sda2
+swapon /dev/sda2
+mkfs.ext4 /dev/sda3
+mkfs.ext4 /dev/sda4 在完成分区格式化操作后将挂载/mnt/gentoo分区到root分区，并在/mnt/gentoo下面创建boot目录和home目录并按照之前设置的分区分别完成挂载操作
+
+mount /dev/sda3 /mnt/gentoo
+mkdir /mnt/gentoo/boot
+mkdir /mnt/gentoo/home
+mount /dev/sda1 /mnt/gentoo/boot
+mount /dev/sda4 /mnt/gentoo/home	
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;##(二) 安装Gentoo安装文件&lt;/p&gt;
+&lt;h3 id=&quot;1安装阶段tar包&quot;&gt;1、安装阶段tar包&lt;/h3&gt;
+&lt;h4 id=&quot;1时间修改&quot;&gt;（1）时间修改&lt;/h4&gt;
+&lt;p&gt;在之前的安装过程中由于镜像自动同步的时间并非是北京时区的时间因此需要手动修改系统时间，但是新版本的安装镜像已经自动检测到了正确的时区因此不需要对时间进行修改，因此该操作略过，但是如果确有需要修改时间可以通过date命令完成时间修改，如下所示：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;date 012523162017	该命令将系统时间设置为2017-01-25 23:16
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;2下载tar包&quot;&gt;（2）下载tar包&lt;/h4&gt;
+&lt;p&gt;前往挂载根文件系统的Gentoo挂载点（很像/mnt/gentoo）：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd /mnt/gentoo
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;根据不同的安装媒介，这里有一堆工具可用来下载一个阶段。这些工具之一就是links，一个非图形化、目录驱动的浏览器。要下载一个阶段，访问到Gentoo镜像列表形如：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;links https://www.gentoo.org/downloads/mirrors/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;通过links工具软件选择相应的源并下载stage3文件，下载完成后将下载文件解压&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;tar xvjpf stage3-*.tar.bz2 --xattrs
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;3配置编译选项&quot;&gt;（3）配置编译选项&lt;/h4&gt;
+&lt;p&gt;通过对/mnt/gentoo/etc/portage/make.conf文件进行修改配置编译选项
+此处采用nano工具进行编辑操作
+其中重点的是对CFLAGS和CXXFLAGS&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;CFLAGS=&quot;-march=native -O2 -pipe&quot;
+# Use the same settings for both variables
+CXXFLAGS=&quot;${CFLAGS}&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;同时添加MAKEOPTS参数，并针对本机的cpu配置参数&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;在make.conf中声明MAKEOPTS的示例
+MAKEOPTS=&quot;-j2&quot; 其中2代表1个cpu+1（1个线程+1）
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;自此完成了gentoo安装文件的安装操作
+##(三) 安装Gentoo基本系统
+本部分完成Gentoo的基本系统的安装操作&lt;/p&gt;
+&lt;h3 id=&quot;1执行chrooting&quot;&gt;1、执行Chrooting&lt;/h3&gt;
+&lt;p&gt;通过配置一些可选参数实现进入安装的基本系统应用环境&lt;/p&gt;
+&lt;h4 id=&quot;1配置镜像站点&quot;&gt;（1）配置镜像站点&lt;/h4&gt;
+&lt;p&gt;通过配置系统软件下载的镜像站点实现更快的软件下载和更新，本处跟之前类似均选择163镜像源&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mirrorselect -i -o &amp;gt;&amp;gt; /mnt/gentoo/etc/portage/make.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;通过该命令将选择的镜像源写入make.conf配置文件
+完整镜像选择后完成Gentoo主仓库的配置
+通过/etc/portage/repos.conf/gentoo.conf文件来配置Gentoo的主仓库。这个文件包含了更新Portage树（包含Portage需要下载和安装软件包所需要的信息的一个ebuild和相关文件的集合）所需要的同步信息。通过几个简单的步骤就可以完成Gentoo主仓库的配置。首先，如果它不存在，则创建repos.conf目录&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir /mnt/gentoo/etc/portage/repos.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;接下来，复制Portage提供的Gentoo仓库配置文件到这个（新创建的）目录：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;通过使用cat命令来看一眼。文件里的内容应该是.ini格式并且看起来像是这样：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[gentoo]
+location = /usr/portage
+sync-type = rsync
+sync-uri = rsync://rsync.gentoo.org/gentoo-portage
+auto-sync = yes
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;2复制dns信息&quot;&gt;（2）复制DNS信息&lt;/h4&gt;
+&lt;p&gt;在进行新环境之前，还有一件要做的事情就是复制/etc/resolv.conf中的DNS信息。需要完成这个来确保即使进入到新环境后网络仍然可以使用。/etc/resolv.conf包含着当前网络中的DNS服务器。
+要复制这个信息，建议通过cp命令的-L选项。这可以保障如果/etc/resolv.conf是一个符号链接的话，复制的是那个目标文件而不是这个符号文件自己。否则在新环境中，符号文件将指向一个不存在的文件（因为链接目标非常可能不会在新环境中）。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cp -L /etc/resolv.conf /mnt/gentoo/etc/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;3挂载必要的文件系统&quot;&gt;（3）挂载必要的文件系统&lt;/h4&gt;
+&lt;p&gt;为了确保新环境正常工作，需要确保一些文件系统可以正常使用。需要提供的文件系统是：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;ul&gt;
+    &lt;li&gt;/proc/ 一个pseudo文件系统（看起来像是常规文件，事实上却是实时生成的），由Linux内核暴露的一些环境信息&lt;/li&gt;
+    &lt;li&gt;/sys/ 一个pseudo文件系统，像要被取代的/proc/一样，比/proc/更加有结构&lt;/li&gt;
+    &lt;li&gt;/dev/ 是一个包含全部设备文件的常规文件系统，一部分由Linux设备管理器（通常是udev）管理&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;/proc/位置将要挂载到/mnt/gentoo/proc/，而其它的两个都是绑定挂载。字面上的意思是，例如/mnt/gentoo/sys/事实上就是/sys/（它只是同一个文件系统的第二个条目点），而/mnt/gentoo/proc/是（可以说是）文件系统的一个新的挂载。
+具体操作命令如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mount -t proc proc /mnt/gentoo/proc
+mount --rbind /sys /mnt/gentoo/sys
+mount --make-rslave /mnt/gentoo/sys
+mount --rbind /dev /mnt/gentoo/dev
+mount --make-rslave /mnt/gentoo/dev
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;4进入新系统环境&quot;&gt;（4）进入新系统环境&lt;/h4&gt;
+&lt;p&gt;现在所有的分区已经初始化，并且基础环境已经安装，是时候进入到新的安装环境了。这意思着会话将把根（所能访问到的最顶层位置）从当前的安装环境（安装CD或其他安装媒介）变为安装系统（叫做初始化分区）。因此叫作change root或chroot。
+完成chroot有三个步骤：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;ul&gt;
+    &lt;li&gt;使用chroot将根位置从/（在安装媒介里）更改成/mnt/gentoo/（在分区里）&lt;/li&gt;
+    &lt;li&gt;使用source命令将一些设置（那些在/etc/profile中的）重新载入到内存中&lt;/li&gt;
+    &lt;li&gt;更改主提示符来帮助我们记住当前会话在一个chroot环境里面&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;具体命令如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;chroot /mnt/gentoo /bin/bash
+source /etc/profile
+export PS1=&quot;(chroot) $PS1&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;2配置portage&quot;&gt;2、配置Portage&lt;/h3&gt;
+&lt;h4 id=&quot;1安装portage快照&quot;&gt;（1）安装Portage快照&lt;/h4&gt;
+&lt;p&gt;接下来，是安装Portage快照，一个用来告诉Portage哪些软件标题可用于安装、哪些配置文件可以由管理员选择等等的文件集合。建议使用emerge-webrsync。这将从Gentoo的一介镜像中得到最新的Portage快照（Gentoo每天发布一个基准）并安装到系统中。&lt;/p&gt;
+&lt;h4 id=&quot;2可选更新portage树&quot;&gt;（2）可选：更新Portage树&lt;/h4&gt;
+&lt;p&gt;Portage树可以更新到最新版本。前面的emerge-webrsync命令将安装一个最近的Portage快照（通常是24小时以内），所以这一步是可选的。
+假设需要最新更新的包（1小时以内），可以使用emerge –sync。这和s命令将使用rsync协议来更新Portage树（之前通过emerge-webrsync获得的）到最新状态。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;emerge --sync 在慢速的终端上，比如一些framebuffer或者串口控制台，建议使用--quiet选项来加速这个进程：
+
+emerge --sync --quiet
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;3阅读新闻条目&quot;&gt;（3）阅读新闻条目&lt;/h4&gt;
+&lt;p&gt;当同步Portage树到系统时，它可能警告用户一条类似于下面的信息：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Portage通知用户关于新闻条目
+* IMPORTANT: 2 news items need reading for repository 'gentoo'.
+ 	* Use eselect news to read news items.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Portage新闻条目的创建是为了提供一个通信媒介，通过rsycn树来推送重要的消息给用户。要管理它们，使用eselect news。eselect应用程序是一个Gentoo应用程序，它允许一个通用的管理界面完成对系统的变更和操作。在这里，要用到eselect的news模块。
+对于news模块，最常用的有三个操作：&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;ul&gt;
+    &lt;li&gt;使用list显示一个可用新闻条目的预览。&lt;/li&gt;
+    &lt;li&gt;使用read来阅读新闻条目。&lt;/li&gt;
+    &lt;li&gt;使用purge将在新闻条目阅读后删除，并且不能再次阅读。&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;eselect news list
+eselect news read
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;更多关于新闻阅读器的信息可以通过其手册页查看:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;man news.eselect
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;4选择正确的配置文件&quot;&gt;(4)选择正确的配置文件&lt;/h4&gt;
+&lt;p&gt;配置文件是任何一个Gentoo系统的积木。它不仅指定USE、CFLAGS和其它重要变量的默认值，还会锁定系统的包版本范围。这些设定全是由Gentoo的Portage开发者们来维护。
+使用eselect，你能看到当前系统正在使用什么配置文件，现在来使用profile模块：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root #eselect profile list
+Available profile symlink targets:
+[1]   default/linux/amd64/13.0 *
+[2]   default/linux/amd64/13.0/desktop
+[3]   default/linux/amd64/13.0/desktop/gnome
+[4]   default/linux/amd64/13.0/desktop/kde 这只是一个示例，根据个人的情况选择需要的，使用如下命令选择
+
+eselect profile set 2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;##由于我要安装kde5桌面，也就是plasma桌面并且要使用systemd作为初始化脚本，因此需要配置一下package.use文件
+具体命令如下&lt;/p&gt;
+
+  &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;echo &quot;media-video/ffmpeg cpu_flags_x86_mmxext&quot; &amp;gt; /etc/portage/package.use/ffmpeg
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;5更新world集合&quot;&gt;(5)更新@world集合&lt;/h4&gt;
+&lt;p&gt;在完成了各项配置后为了是配置生效需要更新world集合尤其是采用systemd作为启动脚本管理，具体命令如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;emerge --ask --update --deep --newuse @world
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;3时区配置&quot;&gt;3、时区配置&lt;/h3&gt;
+&lt;p&gt;为系统选择时区。在/usr/share/zoneinfo/中查找可用的时区，然后写进/etc/timezone文件。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ls /usr/share/zoneinfo
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;假设要选择的时区是Asia/Shanghai：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;echo &quot;Asia/Shanghai&quot; &amp;gt; /etc/timezone
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;请避免使用/usr/share/zoneinfo/Etc/GMT*时区，它们的名字并不意味着想要的时区。例如，GMT-8实际上是GMT+8。
+接下来，重新配置sys-libs/timezone-data包，将会为我们基于/etc/timezone条目更新/etc/localtime文件。/etc/localtime文件用于让系统的C类库知道系统在什么时区。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;emerge --config sys-libs/timezone-data
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;4配置地区&quot;&gt;4、配置地区&lt;/h3&gt;
+&lt;p&gt;大多数用户只想在他们的系统上使用一或两个地区。地区不只是指定系统应该使用的与系统进行交互的语言，同时也指定了字符串排序，日期和时间的显示等规则。系统应该支持的地区应该在/etc/locale.gen中提到。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nano -w /etc/locale.gen
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;下面的地区是一个示例，展示了同时使用英语（美国）和中文（中国）及附加字符格式（如UTF-8）。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;FILE /etc/locale.gen启用US和CN地区及附加字符格式
+en_US ISO-8859-1
+en_US.UTF-8 UTF-8
+zh_CN GBK
+zh_CN.UTF-8 UTF-8 &amp;gt;	警告 强烈建议使用至少一个UTF-8格式的地区设置，因为有些应用程序可能需要它。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;下一步是运行locale-gen。它将生成/etc/locale.gen文件中指定的所有地区。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;locale-gen
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;要验证所选择的地区当前可用，运行locale -a。等完成后，我们就来设定系统级别的区域设置。我们又一次使用eselect来做这件事，现在使用locale模块。通过eselect locale list可显示可用的目标：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;eselect locale list
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;通过eselect locale set VALUE可以设定正确的地区：
+在完成了地区设置后重新加载系统环境：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;env-update &amp;amp;&amp;amp; source /etc/profile &amp;amp;&amp;amp; export PS1=&quot;(chroot) $PS1&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;##（四）配置Linux内核&lt;/p&gt;
+&lt;h3 id=&quot;1安装内核源码&quot;&gt;1、安装内核源码&lt;/h3&gt;
+&lt;p&gt;首先安装内核源码包&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;emerge --ask sys-kernel/gentoo-sources
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;2手动配置内核&quot;&gt;2、手动配置内核&lt;/h3&gt;
+&lt;p&gt;首先可以通过lspci程序来检测硬件信息，该程序在sys-apps/pciutils，安装该软件&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;emerge --ask sys-apps/pciutils
+lspci -k //检测系统硬件
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;检测完系统硬件设备下一步就开始手动编译内核&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd /usr/src/linux
+make menuconfig
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;操作系统内核编译可以参考金步国的Linux-4.4-x86_64 内核配置选项简介&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;http://www.jinbuguo.com/kernel/longterm-linux-kernel-options.html&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;在进行内核编译前由于iwlwifi驱动编译的情况需要将采用的驱动编译到内核因此需要先安装系统所需的firmware固件&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;emerge --ask sys-kernel/linux-firmware
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;手动配置完内核后建议保存内核配置到文件以备将来使用，随后将编译和安装内核&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;make &amp;amp;&amp;amp; make modules_install
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;编译完成后复制内核镜像到/boot分区&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;make install
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;完成内核复制后可以选择生产一个initramfs，创建的原因是当部分文件系统在独立的分区（如：/usr,/var）就需要通过initramfs来完成分区挂载，initramfs需要通过genkernel来完成，因此需要先安装该软件&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;emerge --ask sys-kernel/genkernel //采用rc作为初始化脚本
+emerge --ask sys-kernel/genkernel-next  //采用systemd作为初始化脚本
+genkernel --install initramfs   ///通过该命令创建initramfs
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;如果觉得手动配置较为麻烦也可以通过genkernel工具来自动完成内核构建&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;genkernel all
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;注意 需要将iwlwifi驱动手动编译到内核参数&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;选中 CONFIG_FIRMWARE_IN_KERNEL	
+添加对应的iwlwifi-xxxx.ucode 到该 CONFIG_EXTRA_FIRMWARE
+同时指定iwlwifi-xxxx.ucode 所在目录 CONFIG_EXTRA_FIRMWARE_DIR 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;自此完成了操作系统内核的编译&lt;/p&gt;
+&lt;h2 id=&quot;五系统配置&quot;&gt;（五）系统配置&lt;/h2&gt;
+&lt;p&gt;该阶段完成对整个系统的配置工作&lt;/p&gt;
+&lt;h3 id=&quot;1文件系统配置fstab&quot;&gt;1、文件系统配置fstab&lt;/h3&gt;
+&lt;p&gt;按照自己的分区设置配置相应的/boot,/root,/home的挂载点，建议通过UUID来标识磁盘而不是用/dev/sdaX来标识，可以通过blkid工具来查询每个磁盘的UUID&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nano /etc/fstab
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;修改好硬盘挂载文件后可以配置hostname，修改root密码&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nano -w /etc/conf.d/hostname
+passwd   //修改root密码
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;下一步安装日志工具、网络工具、定时任务&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;emerge --ask app-admin/sysklogd
+emerge --ask sys-process/cronie
+emerge --ask net-misc/dhcpcd
+emerge --ask net-dialup/ppp
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;2配置bootloader&quot;&gt;2、配置bootloader&lt;/h3&gt;
+&lt;p&gt;在完成了一系列基本的系统安装配置后需要完成最后一步，配置bootloader也就是引导器，我的系统默认使用grub2作为引导，首先需要安装grub2软件，同时因为我是采用uefi的，因此需要添加一些额外的标记&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;echo 'GRUB_PLATFORMS=&quot;efi-64&quot;' &amp;gt;&amp;gt; /etc/portage/make.conf
+emerge --ask sys-boot/grub:2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;grub2软件安装好后通过grub-install命令安装GRUB2所需的文件到/boot/grub/目录&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;grub-install /dev/sda	//bios
+grub-install --target=x86_64-efi --efi-directory=/boot   //uefi
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;注意：如果采用systemd作为初始化脚本那么需要额外修改一些配置
+修改/etc/default/grub 文件添加GRUB2 systemd 配置示例
+GRUB_CMDLINE_LINUX=”init=/usr/lib/systemd/systemd”&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;修改完配置文件后需要生成GRUB2&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;grub-mkconfig -o /boot/grub/grub.cfg
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;自此整个基础的系统的安装与配置已经完成&lt;/p&gt;
+</content>
+ </entry>
+ 
+
+</feed>

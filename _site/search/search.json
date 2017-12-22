@@ -1,0 +1,38 @@
+
+
+
+
+[
+  
+  
+    
+    
+      {
+        "title": "Gentoo安装配置",
+        "date": "2017 年 10 月",
+        "excerpt": "Gentoo安装过程\n##（一) 磁盘准备\n1、硬盘分区\n通过cfdisk分区工具将硬盘进行分区操作，总计分为4个区如下所示\n\n  /deve/sda1\tefi 分区\n\n  /dev/sda2\tswap 分区\n\n  /dev/sda3\troot 分区\n\n  /dev/sda4\thome 分区\n\n\n",
+        
+        "url": "/gentoo/2017/10/05/Gentoo%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/"
+      },
+    
+      {
+        "title": "Spring Boot初体验",
+        "date": "2017 年 10 月",
+        "excerpt": "我记得在spring boot出来之前做框架整合是一件非常不愉快的事情，各种jar包版本冲突是非常糟糕的体验，同时那时候主要还是通过xml文件来进行配置，各种配置文件十分繁多，hibernate需要，spring需要，如果用struts还需要，总之就是一个及其麻烦的事情。\n当我第一次见到spring boot的时候我们被惊艳到了，原来开发可以如此的流畅，真正的约定大于配置，各种方便的注解，包整合十分愉快。\n这篇文章就是简单记录一下利用最简单的spring boot快速开发一个web小应用。\n\n  开发环境spring boot + maven\n\n\n",
+        
+        "url": "/spring/2017/10/05/Spring-Boot%E5%88%9D%E4%BD%93%E9%AA%8C/"
+      },
+    
+  
+  
+  
+  {
+    "title": "About me",
+    "date": " ",
+    "excerpt": "\n",
+    
+    "url": "/about/"
+  }
+  
+]
+
