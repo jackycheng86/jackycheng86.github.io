@@ -4,13 +4,361 @@
  <title>jackycheng86小站</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000"/>
- <updated>2017-12-22T16:04:16+08:00</updated>
+ <updated>2017-12-25T11:37:39+08:00</updated>
  <id>http://localhost:4000</id>
  <author>
    <name>jacky</name>
    <email>359202057@qq.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Java 解析PDF内容</title>
+   <link href="http://localhost:4000/java/2017/12/03/Java-%E8%A7%A3%E6%9E%90pdf%E5%86%85%E5%AE%B9/"/>
+   <updated>2017-12-03T00:00:00+08:00</updated>
+   <id>http://localhost:4000/java/2017/12/03/Java 解析pdf内容</id>
+   <content type="html">&lt;p&gt;最近遇到一个老师有点小需求，需要读取一些pdf的内容到数据库里面进行检索，因为一直都在合作所以找到了我。
+百度了一下发现在java下解决pdf内容解析的办法也有不少，我选了apache的pdfbox来做pdf的内容解析工作，&lt;a href=&quot;https://pdfbox.apache.org/&quot;&gt;pdfbox官网&lt;/a&gt;
+开发环境&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;spring boot&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;先看pom.xml&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;project&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://maven.apache.org/POM/4.0.0&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:xsi=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&lt;/span&gt;
+	&lt;span class=&quot;na&quot;&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;modelVersion&amp;gt;&lt;/span&gt;4.0.0&lt;span class=&quot;nt&quot;&gt;&amp;lt;/modelVersion&amp;gt;&lt;/span&gt;
+
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.pdf&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;pdf&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;0.0.1-SNAPSHOT&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;packaging&amp;gt;&lt;/span&gt;jar&lt;span class=&quot;nt&quot;&gt;&amp;lt;/packaging&amp;gt;&lt;/span&gt;
+
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;pdf&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;description&amp;gt;&lt;/span&gt;Demo project for Spring Boot&lt;span class=&quot;nt&quot;&gt;&amp;lt;/description&amp;gt;&lt;/span&gt;
+
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework.boot&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-boot-starter-parent&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.5.8.RELEASE&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;relativePath/&amp;gt;&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- lookup parent from repository --&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
+
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;properties&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;project.build.sourceEncoding&amp;gt;&lt;/span&gt;UTF-8&lt;span class=&quot;nt&quot;&gt;&amp;lt;/project.build.sourceEncoding&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;project.reporting.outputEncoding&amp;gt;&lt;/span&gt;UTF-8&lt;span class=&quot;nt&quot;&gt;&amp;lt;/project.reporting.outputEncoding&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;java.version&amp;gt;&lt;/span&gt;1.8&lt;span class=&quot;nt&quot;&gt;&amp;lt;/java.version&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/properties&amp;gt;&lt;/span&gt;
+
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;dependencies&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework.boot&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-boot-starter-web&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework.boot&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-boot-devtools&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;runtime&lt;span class=&quot;nt&quot;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework.boot&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-boot-starter-test&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;test&lt;span class=&quot;nt&quot;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.pdfbox&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;pdfbox&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;2.0.4&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- https://mvnrepository.com/artifact/org.apache.pdfbox/fontbox --&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.pdfbox&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;fontbox&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;2.0.8&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependencies&amp;gt;&lt;/span&gt;
+
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;build&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;plugins&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
+				&lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework.boot&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+				&lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-boot-maven-plugin&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;/plugins&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/build&amp;gt;&lt;/span&gt;
+
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/project&amp;gt;&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;我做测试的是偶pdfbox最新版本为2.0.4现在可能有更新的版本，自己按照需要进行修改吧。
+我这里做的测试是从pdf解析出文本数据，然后再将解析出来的文本数据保存到一个txt文本，贴代码&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@Test
+	public void pdfTest() {
+        try {
+            // 是否排序
+            boolean sort = false;
+            // 开始提取页数
+            int startPage = 1;
+            // 结束提取页数
+            int endPage = Integer.MAX_VALUE;
+            String content = null;
+            PrintWriter writer = null;
+            //pdf文本路径
+            String path = &quot;/home/jacky/upload-dir/test.pdf&quot;;
+            //输出txt文本路径
+            String target=&quot;/home/jacky/upload-dir/test.txt&quot;;
+            PDDocument document = PDDocument.load(new File(path));
+            PDFTextStripper pts = new PDFTextStripper();
+            endPage = document.getNumberOfPages();
+            System.out.println(&quot;Total Page: &quot; + endPage);
+            pts.setStartPage(startPage);
+            pts.setEndPage(endPage);
+            try {
+            	//content就是从pdf中解析出来的文本
+                content = pts.getText(document);
+                writer = new PrintWriter(new FileOutputStream(target));
+                writer.write(content);// 写入文件内容
+                writer.flush();
+                writer.close();
+            } catch (Exception e) {
+                throw e;
+            }finally {
+                if (null != document)
+                    document.close();
+            }
+            System.out.println(&quot;Get PDF Content ...&quot;);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这样我们就完成了一个简单的解析pdf文本的测试，但是请注意我这里示例的pdf保存的是文本类型的内容而不是图片形式的文本内容。我这里只是简单的介绍了一下pdfbox读取文本格式的内容，官方的svn代码提供了很多的demo，所以可以checkout一下官方的示例代码&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;svn checkout http://svn.apache.org/repos/asf/pdfbox/trunk/examples&lt;/p&gt;
+&lt;/blockquote&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
+   <title>向filter过滤器中的request对象添加额外的参数</title>
+   <link href="http://localhost:4000/java/2017/11/05/%E5%90%91filter%E8%BF%87%E6%BB%A4%E5%99%A8%E4%B8%AD%E7%9A%84request%E5%AF%B9%E8%B1%A1%E6%B7%BB%E5%8A%A0%E9%A2%9D%E5%A4%96%E7%9A%84%E5%8F%82%E6%95%B0/"/>
+   <updated>2017-11-05T00:00:00+08:00</updated>
+   <id>http://localhost:4000/java/2017/11/05/向filter过滤器中的request对象添加额外的参数</id>
+   <content type="html">&lt;p&gt;有时候我们会遇到这么一些需求，在filter中获取一些参数进行处理，同时将处理好的参数重新添加到request对象中，这时候我们在filter中直接使用request.setAttribute()是无效的。我们怎么来解决这个问题呢，j2ee已经给我们提供了解决的办法，使用HttpServletRequestWrapper类来解决向request添加额外参数的功能。&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;环境：spring boot&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;##新建一个类
+新建一个类，这个类继承自HttpServletRequestWrapper&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;myp2c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;common&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;servlet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpServletRequest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;servlet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpServletRequestWrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;java&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;util&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HashMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;java&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;util&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;/**&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;myp2c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;common&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Administrator&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2017&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;18&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;**/&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RequestParameterWrapper&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HttpServletRequestWrapper&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HashMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&amp;gt;();&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RequestParameterWrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpServletRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;//&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;将现有&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parameter&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;传递给&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;putAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getParameterMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;p&quot;&gt;//&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;重载构造函数&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RequestParameterWrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpServletRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;extraParams&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;addParameters&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;extraParams&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+	&lt;span class=&quot;p&quot;&gt;//&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;添加额外参数&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;addParameters&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;extraParams&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Entry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;extraParams&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;entrySet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;addParameter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getKey&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;getValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;addParameter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;!= null) {
+&lt;/span&gt;            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;instanceof&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[])&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[])&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;instanceof&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]{(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]{&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;valueOf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)});&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;通过建立这个类我们就能完成向request对象添加自己想要的参数了。
+##添加自定义参数
+我们实现一个filter，这个filter实现一个功能，获取用户浏览器所访问的域名，并且将用户访问的域名构建为一个新的参数添加到request对象中去。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;myp2c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;common&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;slf4j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;slf4j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LoggerFactory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;servlet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.*;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;servlet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpServletRequest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;java&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;io&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;java&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;util&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HashMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;java&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;util&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;/**&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;myp2c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;common&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Administrator&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2017&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;18&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;**/&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RequestFilter&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Filter&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LoggerFactory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getLogger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;getClass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+
+    &lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Override&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;FilterConfig&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filterConfig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServletException&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Override&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doFilter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ServletRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;servletRequest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServletResponse&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;servletResponse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FilterChain&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filterChain&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServletException&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;HttpServletRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpServletRequest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;servletRequest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;//&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dn&lt;/span&gt;                                   &lt;span class=&quot;err&quot;&gt;：域名&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;//&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dn&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getServerName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;extraParams&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HashMap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;extraParams&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;dn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;//&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;利用原始的&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;对象创建自己扩展的&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;对象并添加自定义参数&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;RequestParameterWrapper&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requestParameterWrapper&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RequestParameterWrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;requestParameterWrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;addParameters&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;extraParams&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;filterChain&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;doFilter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;requestParameterWrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;servletResponse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Override&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;destroy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;##spring boot配置filter
+我们在完成了添加自定义参数之后就需要在spring boot配置我们定义filter了，具体代码如下&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;myp2c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;myp2c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;common&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RequestFilter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;springframework&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;boot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;builder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SpringApplicationBuilder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;springframework&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;boot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;web&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;servlet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;FilterRegistrationBean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;springframework&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;boot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;web&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;servlet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ServletComponentScan&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;springframework&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;boot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;web&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;support&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SpringBootServletInitializer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;springframework&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;annotation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Bean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;springframework&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;annotation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Configuration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;servlet&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Configuration&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ServletComponentScan&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServletInitializer&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SpringBootServletInitializer&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+	&lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Override&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;protected&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SpringApplicationBuilder&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;configure&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SpringApplicationBuilder&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;application&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;application&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sources&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Myp2cMainApplication&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Bean&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FilterRegistrationBean&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contextFilterRegistrationBean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;FilterRegistrationBean&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;registrationBean&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FilterRegistrationBean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;registrationBean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setFilter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;requestFilter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;registrationBean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;addUrlPatterns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;registrationBean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;requestFilter&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;registrationBean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setOrder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;registrationBean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Bean&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Filter&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requestFilter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RequestFilter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这样我们就实现了向request对象中添加我们自定义好了的参数了。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Spring Boot使用静态资源</title>
+   <link href="http://localhost:4000/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/"/>
+   <updated>2017-10-18T00:00:00+08:00</updated>
+   <id>http://localhost:4000/spring/2017/10/18/Spring Boot使用静态资源</id>
+   <content type="html">&lt;p&gt;在我们使用Spring boot进行web开发时都会遇到引入各类js、css、html、image等各种静态资源文件，这时候我们就需要进行相应的配置来允许应用访问这些静态资源。
+我们还是基于之前的采用thymeleaf 作为模板的 spring boot来开发
+&lt;a href=&quot;http://blog.csdn.net/tyyytcj/article/details/78268310&quot;&gt;Spring Boot使用Thymeleaf&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;首先我们在resource目录下面建3各文件夹分别是：static、js、css，同时在static目录下建一个子目录html，在js下建一个子目录lib，目录结构如下
+++—-resources
++——–css
++——–js
++———-lib
++——–static
++———-html
+在css目录添加了bootstrap.min.css，在js/lib添加了bootstrap.min.js和jquery.mini.js，在static下面添加了test.html，并在static/html下也添加了一个test.html，两个html内容不一致，同时在html页面引用相应的静态资源&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lang=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;en&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;head&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;meta&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;charset=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;UTF-8&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;title&amp;gt;&lt;/span&gt;Title&lt;span class=&quot;nt&quot;&gt;&amp;lt;/title&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;link&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;rel=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;stylesheet&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;href=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/bootstrap.min.css&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/lib/jquery.min.js&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/head&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+dasfdasfdasgasdg
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这时候如果没有配置静态资源访问，在对静态内容进行访问的时候会出现404错误
+这时候我们就需要添加一些配置来完成静态资源的访问，我们在application.properties文件中添加部分配置项&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;spring.mvc.static-path-pattern=/**
+spring.resources.static-locations=classpath:/static/,classpath:/js/,classpath:/css/&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;第一行表示我们将对所有请求的静态资源进行过滤，经过实践证明这段配置可添加可不添加
+第二行配置，可以看出来我们是将static、js、css目录标记为静态资源目录，多个目录之间通过逗号隔开如果你有更多的静态资源目录添加相应的路径即可
+有了第二行配置，你在页面中引入的js、css就能被正确的识别而不再是报404错误了
+当你在Controller中想跳转到静态html界面可以采用forward或者redirect的方式跳转例如：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hw&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;myp2c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;common&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;controller&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;springframework&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stereotype&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Controller&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;springframework&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ui&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;Model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;springframework&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;web&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;annotation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetMapping&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;springframework&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;web&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;annotation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RequestMapping&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Controller&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RequestMapping&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MainController&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetMapping&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;Model&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;addAttribute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;w&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Welcome Thymeleaf!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;forward:/test.html&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Spring Boot初体验</title>

@@ -8,7 +8,7 @@
     
     
     
-    <title>Spring Boot初体验 | jackycheng86小站</title>
+    <title>Java 解析PDF内容 | jackycheng86小站</title>
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
@@ -23,12 +23,12 @@
     
     <meta property="og:type" content="article">
     
-    <meta property="og:title" content="Spring Boot初体验">
-    <meta property="og:url" content="/spring/2017/10/05/Spring-Boot%E5%88%9D%E4%BD%93%E9%AA%8C/">
+    <meta property="og:title" content="Java 解析PDF内容">
+    <meta property="og:url" content="/java/2017/12/03/Java-%E8%A7%A3%E6%9E%90pdf%E5%86%85%E5%AE%B9/">
     <meta property="og:site_name" content="jackycheng86小站">
     <meta property="og:description" content="">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Spring Boot初体验">
+    <meta name="twitter:title" content="Java 解析PDF内容">
     <meta name="twitter:description" content="page.description">
     <meta name="twitter:creator" content="@">
     <link rel="publisher" href="">
@@ -97,14 +97,14 @@
 	<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/spring/2017/10/05/Spring-Boot%E5%88%9D%E4%BD%93%E9%AA%8C/" title="Spring Boot初体验" itemprop="url">Spring Boot初体验</a>
+      <a href="/java/2017/12/03/Java-%E8%A7%A3%E6%9E%90pdf%E5%86%85%E5%AE%B9/" title="Java 解析PDF内容" itemprop="url">Java 解析PDF内容</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="jacky" target="_blank" itemprop="author">jacky</a>
 		
   <p class="article-time">
-    <time datetime="2017-10-05 07:29:53 +0800" itemprop="datePublished"> 发表于 2017-10-05</time>
+    <time datetime="2017-12-03 00:00:00 +0800" itemprop="datePublished"> 发表于 2017-12-03</time>
     
   </p>
 </header>
@@ -116,175 +116,131 @@
 		
 		</div>
 		
-		<p>我记得在spring boot出来之前做框架整合是一件非常不愉快的事情，各种jar包版本冲突是非常糟糕的体验，同时那时候主要还是通过xml文件来进行配置，各种配置文件十分繁多，hibernate需要，spring需要，如果用struts还需要，总之就是一个及其麻烦的事情。
-当我第一次见到spring boot的时候我们被惊艳到了，原来开发可以如此的流畅，真正的约定大于配置，各种方便的注解，包整合十分愉快。
-这篇文章就是简单记录一下利用最简单的spring boot快速开发一个web小应用。</p>
+		<p>最近遇到一个老师有点小需求，需要读取一些pdf的内容到数据库里面进行检索，因为一直都在合作所以找到了我。
+百度了一下发现在java下解决pdf内容解析的办法也有不少，我选了apache的pdfbox来做pdf的内容解析工作，<a href="https://pdfbox.apache.org/">pdfbox官网</a>
+开发环境</p>
 <blockquote>
-  <p>开发环境spring boot + maven</p>
+  <p>spring boot</p>
 </blockquote>
 
-<p>开发环境自己配置（jdk+maven）
-##spring boot初始化
-首先你可以到spring官网去初始化项目https://start.spring.io/ ，在这里可以针对你自己的应用场景进行配置，同时选择整合你需要的各种包，最后再下载下来用你习惯的开发工具打开即可。
-简单看看我自己的pom.xml文件</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;groupId&gt;com.material&lt;/groupId&gt;
-	&lt;artifactId&gt;data&lt;/artifactId&gt;
-	&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
-	&lt;packaging&gt;war&lt;/packaging&gt;
+<p>先看pom.xml</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+	<span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
 
-	&lt;name&gt;data&lt;/name&gt;
-	&lt;description&gt;Demo project for Spring Boot&lt;/description&gt;
+	<span class="nt">&lt;groupId&gt;</span>com.pdf<span class="nt">&lt;/groupId&gt;</span>
+	<span class="nt">&lt;artifactId&gt;</span>pdf<span class="nt">&lt;/artifactId&gt;</span>
+	<span class="nt">&lt;version&gt;</span>0.0.1-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+	<span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
 
-	&lt;parent&gt;
-		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-		&lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
-		&lt;version&gt;1.5.2.RELEASE&lt;/version&gt;
-		&lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
-	&lt;/parent&gt;
+	<span class="nt">&lt;name&gt;</span>pdf<span class="nt">&lt;/name&gt;</span>
+	<span class="nt">&lt;description&gt;</span>Demo project for Spring Boot<span class="nt">&lt;/description&gt;</span>
 
-	&lt;properties&gt;
-		&lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
-		&lt;project.reporting.outputEncoding&gt;UTF-8&lt;/project.reporting.outputEncoding&gt;
-		&lt;java.version&gt;1.8&lt;/java.version&gt;
-	&lt;/properties&gt;
+	<span class="nt">&lt;parent&gt;</span>
+		<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+		<span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-parent<span class="nt">&lt;/artifactId&gt;</span>
+		<span class="nt">&lt;version&gt;</span>1.5.8.RELEASE<span class="nt">&lt;/version&gt;</span>
+		<span class="nt">&lt;relativePath/&gt;</span> <span class="c">&lt;!-- lookup parent from repository --&gt;</span>
+	<span class="nt">&lt;/parent&gt;</span>
 
-	&lt;dependencies&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-			&lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-			&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
-		&lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-cache&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-			&lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;
-			&lt;scope&gt;provided&lt;/scope&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;com.google.guava&lt;/groupId&gt;
-			&lt;artifactId&gt;guava&lt;/artifactId&gt;
-			&lt;version&gt;19.0&lt;/version&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-			&lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
-			&lt;scope&gt;test&lt;/scope&gt;
-		&lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;
-            &lt;artifactId&gt;tomcat-embed-jasper&lt;/artifactId&gt;
-            &lt;scope&gt;provided&lt;/scope&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;com.oracle&lt;/groupId&gt;
-            &lt;artifactId&gt;ojdbc6&lt;/artifactId&gt;
-            &lt;version&gt;11.2.0.4&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
-            &lt;artifactId&gt;jstl&lt;/artifactId&gt;
-            &lt;version&gt;1.2&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
-            &lt;artifactId&gt;druid&lt;/artifactId&gt;
-            &lt;version&gt;1.0.25&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;
-            &lt;optional&gt;true&lt;/optional&gt;
-        &lt;/dependency&gt;
-    &lt;/dependencies&gt;
+	<span class="nt">&lt;properties&gt;</span>
+		<span class="nt">&lt;project.build.sourceEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.build.sourceEncoding&gt;</span>
+		<span class="nt">&lt;project.reporting.outputEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.reporting.outputEncoding&gt;</span>
+		<span class="nt">&lt;java.version&gt;</span>1.8<span class="nt">&lt;/java.version&gt;</span>
+	<span class="nt">&lt;/properties&gt;</span>
+
+	<span class="nt">&lt;dependencies&gt;</span>
+		<span class="nt">&lt;dependency&gt;</span>
+			<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+			<span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="nt">&lt;/artifactId&gt;</span>
+		<span class="nt">&lt;/dependency&gt;</span>
+
+		<span class="nt">&lt;dependency&gt;</span>
+			<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+			<span class="nt">&lt;artifactId&gt;</span>spring-boot-devtools<span class="nt">&lt;/artifactId&gt;</span>
+			<span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
+		<span class="nt">&lt;/dependency&gt;</span>
+		<span class="nt">&lt;dependency&gt;</span>
+			<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+			<span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-test<span class="nt">&lt;/artifactId&gt;</span>
+			<span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+		<span class="nt">&lt;/dependency&gt;</span>
+
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.pdfbox<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>pdfbox<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>2.0.4<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="c">&lt;!-- https://mvnrepository.com/artifact/org.apache.pdfbox/fontbox --&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.pdfbox<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>fontbox<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>2.0.8<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+
+    <span class="nt">&lt;/dependencies&gt;</span>
+
+	<span class="nt">&lt;build&gt;</span>
+		<span class="nt">&lt;plugins&gt;</span>
+			<span class="nt">&lt;plugin&gt;</span>
+				<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+				<span class="nt">&lt;artifactId&gt;</span>spring-boot-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+			<span class="nt">&lt;/plugin&gt;</span>
+		<span class="nt">&lt;/plugins&gt;</span>
+	<span class="nt">&lt;/build&gt;</span>
+
+
+<span class="nt">&lt;/project&gt;</span>
+
 </code></pre></div></div>
-<p>因为个人比较习惯jsp所以页面就没有采用其他的模板技术，因此我的application.properties文件配置如下</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spring.freemarker.checkTemplateLocation: false
-spring.mvc.view.prefix: /WEB-INF/jsp/
-spring.mvc.view.suffix: .jsp
-spring.mvc.locale: zh_CN
-spring.http.encoding.charset: UTF-8
-spring.http.encoding.enabled: true
-spring.http.encoding.force: true
-</code></pre></div></div>
-<p>同时在src目录下添加一个webapp目录，再在webapp目录下添加 /WEB-INF/jsp/，与各配置文件目录对应</p>
-
-<p>自己添加了applcationContext.xml文件用于提供对一些静态文件的访问</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;context:property-placeholder location="classpath:application.properties,classpath:config.properties"/&gt;
-    &lt;!-- 静态资源访问 --&gt;
-    &lt;mvc:resources mapping="/js/**" location="/WEB-INF/js/"/&gt;
-    &lt;mvc:resources mapping="/img/**" location="/WEB-INF/img/"/&gt;
-    &lt;mvc:resources mapping="/css/**" location="/WEB-INF/css/"/&gt;
-    &lt;mvc:resources mapping="/assets/**" location="/WEB-INF/assets/"/&gt;
-</code></pre></div></div>
-
-<p>##各类配置
-通过spring官网会默认帮你生成两个类</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@EnableAutoConfiguration
-@SpringBootApplication
-@ComponentScan
-@ServletComponentScan
-@EnableCaching
-public class MaterialApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(MaterialApplication.class, args);
-	}
-}
-</code></pre></div></div>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Configuration
-@ImportResource({"classpath:applicationContext.xml"})
-public class ServletInitializer extends SpringBootServletInitializer {
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(MaterialApplication.class);
+<p>我做测试的是偶pdfbox最新版本为2.0.4现在可能有更新的版本，自己按照需要进行修改吧。
+我这里做的测试是从pdf解析出文本数据，然后再将解析出来的文本数据保存到一个txt文本，贴代码</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Test
+	public void pdfTest() {
+        try {
+            // 是否排序
+            boolean sort = false;
+            // 开始提取页数
+            int startPage = 1;
+            // 结束提取页数
+            int endPage = Integer.MAX_VALUE;
+            String content = null;
+            PrintWriter writer = null;
+            //pdf文本路径
+            String path = "/home/jacky/upload-dir/test.pdf";
+            //输出txt文本路径
+            String target="/home/jacky/upload-dir/test.txt";
+            PDDocument document = PDDocument.load(new File(path));
+            PDFTextStripper pts = new PDFTextStripper();
+            endPage = document.getNumberOfPages();
+            System.out.println("Total Page: " + endPage);
+            pts.setStartPage(startPage);
+            pts.setEndPage(endPage);
+            try {
+            	//content就是从pdf中解析出来的文本
+                content = pts.getText(document);
+                writer = new PrintWriter(new FileOutputStream(target));
+                writer.write(content);// 写入文件内容
+                writer.flush();
+                writer.close();
+            } catch (Exception e) {
+                throw e;
+            }finally {
+                if (null != document)
+                    document.close();
+            }
+            System.out.println("Get PDF Content ...");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
 </code></pre></div></div>
-<p>具体的注解我也就不详细描述了，百度很多也很详细
-通过上面的一系列配置我们就搭建好了一个基本的基于spring boot的web应用</p>
-
-<p>##定义controller和jsp
-在完成配置的基础上我们会定义自己的Controller以及jsp页面
-controller类</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Controller
-public class HelloController {
-
-    @RequestMapping("/hello")
-    public String greeting(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model) {
-        model.addAttribute("name", name);
-        return "hello";
-    }
-
-}
-</code></pre></div></div>
-<p>jsp页面</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;</span><span class="err">%@</span> <span class="na">page</span> <span class="na">language=</span><span class="s">"java"</span> <span class="na">contentType=</span><span class="s">"text/html;charset=utf-8"</span><span class="err">%</span><span class="nt">&gt;</span>
-<span class="cp">&lt;!DOCTYPE html&gt;</span>
-
-<span class="nt">&lt;</span><span class="err">%@</span> <span class="na">taglib</span> <span class="na">prefix=</span><span class="s">"spring"</span> <span class="na">uri=</span><span class="s">"http://www.springframework.org/tags"</span><span class="err">%</span><span class="nt">&gt;</span>
-<span class="nt">&lt;</span><span class="err">%@</span> <span class="na">taglib</span> <span class="na">prefix=</span><span class="s">"c"</span> <span class="na">uri=</span><span class="s">"http://java.sun.com/jsp/jstl/core"</span><span class="err">%</span><span class="nt">&gt;</span>
-
-<span class="nt">&lt;html&gt;</span>
-<span class="nt">&lt;head&gt;</span>
-    <span class="nt">&lt;title&gt;</span>Hello World<span class="nt">&lt;/title&gt;</span>
-<span class="nt">&lt;/head&gt;</span>
-<span class="nt">&lt;body&gt;</span>
-Hello,${name}
-<span class="nt">&lt;/body&gt;</span>
-<span class="nt">&lt;/html&gt;</span>
-
-</code></pre></div></div>
-<p>下一步就是进入命令行，从命令行进入项目目录然后用maven启动项目</p>
+<p>这样我们就完成了一个简单的解析pdf文本的测试，但是请注意我这里示例的pdf保存的是文本类型的内容而不是图片形式的文本内容。我这里只是简单的介绍了一下pdfbox读取文本格式的内容，官方的svn代码提供了很多的demo，所以可以checkout一下官方的示例代码</p>
 <blockquote>
-  <p>mvn spring-boot:run</p>
+  <p>svn checkout http://svn.apache.org/repos/asf/pdfbox/trunk/examples</p>
 </blockquote>
+
   
 	</div>
 	<footer class="article-footer clearfix">
@@ -301,7 +257,7 @@ Hello,${name}
   }) %>
   -->
   
-  <a class="article-category-link" href="/categories/#Spring">Spring</a>
+  <a class="article-category-link" href="/categories/#Java">Java</a>
   
 </div>
 
@@ -315,10 +271,6 @@ Hello,${name}
   <span></span> <!--<%- tags.join('') %>-->
   
   
-  <a href="/tags/#Spring Boot">Spring Boot</a>
-  
-  <a href="/tags/#Spring">Spring</a>
-  
   <a href="/tags/#Java">Java</a>
   
   </div>
@@ -329,7 +281,7 @@ Hello,${name}
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://localhost:4000/spring/2017/10/05/Spring-Boot%E5%88%9D%E4%BD%93%E9%AA%8C/" data-title="Spring Boot初体验 | jackycheng86小站" data-tsina="" class="share clearfix">
+	  <div data-url="http://localhost:4000/java/2017/12/03/Java-%E8%A7%A3%E6%9E%90pdf%E5%86%85%E5%AE%B9/" data-title="Java 解析PDF内容 | jackycheng86小站" data-tsina="" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -342,21 +294,13 @@ Hello,${name}
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/gentoo/2017/10/05/Gentoo%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" title="Gentoo安装配置">
+ <a href="/java/2017/11/05/%E5%90%91filter%E8%BF%87%E6%BB%A4%E5%99%A8%E4%B8%AD%E7%9A%84request%E5%AF%B9%E8%B1%A1%E6%B7%BB%E5%8A%A0%E9%A2%9D%E5%A4%96%E7%9A%84%E5%8F%82%E6%95%B0/" title="向filter过滤器中的request对象添加额外的参数">
   <strong>上一篇：</strong><br/>
   <span>
-  Gentoo安装配置</span>
+  向filter过滤器中的request对象添加额外的参数</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/"  title="Spring Boot使用静态资源">
- <strong>下一篇：</strong><br/> 
- <span>Spring Boot使用静态资源
-</span>
-</a>
-</div>
 
 </nav>
 

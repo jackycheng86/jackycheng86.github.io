@@ -8,7 +8,7 @@
     
     
     
-    <title>Spring Boot初体验 | jackycheng86小站</title>
+    <title>Spring Boot使用静态资源 | jackycheng86小站</title>
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
@@ -23,12 +23,12 @@
     
     <meta property="og:type" content="article">
     
-    <meta property="og:title" content="Spring Boot初体验">
-    <meta property="og:url" content="/spring/2017/10/05/Spring-Boot%E5%88%9D%E4%BD%93%E9%AA%8C/">
+    <meta property="og:title" content="Spring Boot使用静态资源">
+    <meta property="og:url" content="/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/">
     <meta property="og:site_name" content="jackycheng86小站">
     <meta property="og:description" content="">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Spring Boot初体验">
+    <meta name="twitter:title" content="Spring Boot使用静态资源">
     <meta name="twitter:description" content="page.description">
     <meta name="twitter:creator" content="@">
     <link rel="publisher" href="">
@@ -97,14 +97,14 @@
 	<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/spring/2017/10/05/Spring-Boot%E5%88%9D%E4%BD%93%E9%AA%8C/" title="Spring Boot初体验" itemprop="url">Spring Boot初体验</a>
+      <a href="/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/" title="Spring Boot使用静态资源" itemprop="url">Spring Boot使用静态资源</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="jacky" target="_blank" itemprop="author">jacky</a>
 		
   <p class="article-time">
-    <time datetime="2017-10-05 07:29:53 +0800" itemprop="datePublished"> 发表于 2017-10-05</time>
+    <time datetime="2017-10-18 00:00:00 +0800" itemprop="datePublished"> 发表于 2017-10-18</time>
     
   </p>
 </header>
@@ -116,175 +116,61 @@
 		
 		</div>
 		
-		<p>我记得在spring boot出来之前做框架整合是一件非常不愉快的事情，各种jar包版本冲突是非常糟糕的体验，同时那时候主要还是通过xml文件来进行配置，各种配置文件十分繁多，hibernate需要，spring需要，如果用struts还需要，总之就是一个及其麻烦的事情。
-当我第一次见到spring boot的时候我们被惊艳到了，原来开发可以如此的流畅，真正的约定大于配置，各种方便的注解，包整合十分愉快。
-这篇文章就是简单记录一下利用最简单的spring boot快速开发一个web小应用。</p>
-<blockquote>
-  <p>开发环境spring boot + maven</p>
-</blockquote>
+		<p>在我们使用Spring boot进行web开发时都会遇到引入各类js、css、html、image等各种静态资源文件，这时候我们就需要进行相应的配置来允许应用访问这些静态资源。
+我们还是基于之前的采用thymeleaf 作为模板的 spring boot来开发
+<a href="http://blog.csdn.net/tyyytcj/article/details/78268310">Spring Boot使用Thymeleaf</a></p>
 
-<p>开发环境自己配置（jdk+maven）
-##spring boot初始化
-首先你可以到spring官网去初始化项目https://start.spring.io/ ，在这里可以针对你自己的应用场景进行配置，同时选择整合你需要的各种包，最后再下载下来用你习惯的开发工具打开即可。
-简单看看我自己的pom.xml文件</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;groupId&gt;com.material&lt;/groupId&gt;
-	&lt;artifactId&gt;data&lt;/artifactId&gt;
-	&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
-	&lt;packaging&gt;war&lt;/packaging&gt;
-
-	&lt;name&gt;data&lt;/name&gt;
-	&lt;description&gt;Demo project for Spring Boot&lt;/description&gt;
-
-	&lt;parent&gt;
-		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-		&lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
-		&lt;version&gt;1.5.2.RELEASE&lt;/version&gt;
-		&lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
-	&lt;/parent&gt;
-
-	&lt;properties&gt;
-		&lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
-		&lt;project.reporting.outputEncoding&gt;UTF-8&lt;/project.reporting.outputEncoding&gt;
-		&lt;java.version&gt;1.8&lt;/java.version&gt;
-	&lt;/properties&gt;
-
-	&lt;dependencies&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-			&lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-			&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
-		&lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-cache&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-			&lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;
-			&lt;scope&gt;provided&lt;/scope&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;com.google.guava&lt;/groupId&gt;
-			&lt;artifactId&gt;guava&lt;/artifactId&gt;
-			&lt;version&gt;19.0&lt;/version&gt;
-		&lt;/dependency&gt;
-		&lt;dependency&gt;
-			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-			&lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
-			&lt;scope&gt;test&lt;/scope&gt;
-		&lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;
-            &lt;artifactId&gt;tomcat-embed-jasper&lt;/artifactId&gt;
-            &lt;scope&gt;provided&lt;/scope&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;com.oracle&lt;/groupId&gt;
-            &lt;artifactId&gt;ojdbc6&lt;/artifactId&gt;
-            &lt;version&gt;11.2.0.4&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
-            &lt;artifactId&gt;jstl&lt;/artifactId&gt;
-            &lt;version&gt;1.2&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
-            &lt;artifactId&gt;druid&lt;/artifactId&gt;
-            &lt;version&gt;1.0.25&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;
-            &lt;optional&gt;true&lt;/optional&gt;
-        &lt;/dependency&gt;
-    &lt;/dependencies&gt;
-</code></pre></div></div>
-<p>因为个人比较习惯jsp所以页面就没有采用其他的模板技术，因此我的application.properties文件配置如下</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spring.freemarker.checkTemplateLocation: false
-spring.mvc.view.prefix: /WEB-INF/jsp/
-spring.mvc.view.suffix: .jsp
-spring.mvc.locale: zh_CN
-spring.http.encoding.charset: UTF-8
-spring.http.encoding.enabled: true
-spring.http.encoding.force: true
-</code></pre></div></div>
-<p>同时在src目录下添加一个webapp目录，再在webapp目录下添加 /WEB-INF/jsp/，与各配置文件目录对应</p>
-
-<p>自己添加了applcationContext.xml文件用于提供对一些静态文件的访问</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;context:property-placeholder location="classpath:application.properties,classpath:config.properties"/&gt;
-    &lt;!-- 静态资源访问 --&gt;
-    &lt;mvc:resources mapping="/js/**" location="/WEB-INF/js/"/&gt;
-    &lt;mvc:resources mapping="/img/**" location="/WEB-INF/img/"/&gt;
-    &lt;mvc:resources mapping="/css/**" location="/WEB-INF/css/"/&gt;
-    &lt;mvc:resources mapping="/assets/**" location="/WEB-INF/assets/"/&gt;
-</code></pre></div></div>
-
-<p>##各类配置
-通过spring官网会默认帮你生成两个类</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@EnableAutoConfiguration
-@SpringBootApplication
-@ComponentScan
-@ServletComponentScan
-@EnableCaching
-public class MaterialApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(MaterialApplication.class, args);
-	}
-}
-</code></pre></div></div>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Configuration
-@ImportResource({"classpath:applicationContext.xml"})
-public class ServletInitializer extends SpringBootServletInitializer {
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(MaterialApplication.class);
-    }
-
-</code></pre></div></div>
-<p>具体的注解我也就不详细描述了，百度很多也很详细
-通过上面的一系列配置我们就搭建好了一个基本的基于spring boot的web应用</p>
-
-<p>##定义controller和jsp
-在完成配置的基础上我们会定义自己的Controller以及jsp页面
-controller类</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Controller
-public class HelloController {
-
-    @RequestMapping("/hello")
-    public String greeting(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model) {
-        model.addAttribute("name", name);
-        return "hello";
-    }
-
-}
-</code></pre></div></div>
-<p>jsp页面</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;</span><span class="err">%@</span> <span class="na">page</span> <span class="na">language=</span><span class="s">"java"</span> <span class="na">contentType=</span><span class="s">"text/html;charset=utf-8"</span><span class="err">%</span><span class="nt">&gt;</span>
-<span class="cp">&lt;!DOCTYPE html&gt;</span>
-
-<span class="nt">&lt;</span><span class="err">%@</span> <span class="na">taglib</span> <span class="na">prefix=</span><span class="s">"spring"</span> <span class="na">uri=</span><span class="s">"http://www.springframework.org/tags"</span><span class="err">%</span><span class="nt">&gt;</span>
-<span class="nt">&lt;</span><span class="err">%@</span> <span class="na">taglib</span> <span class="na">prefix=</span><span class="s">"c"</span> <span class="na">uri=</span><span class="s">"http://java.sun.com/jsp/jstl/core"</span><span class="err">%</span><span class="nt">&gt;</span>
-
-<span class="nt">&lt;html&gt;</span>
+<p>首先我们在resource目录下面建3各文件夹分别是：static、js、css，同时在static目录下建一个子目录html，在js下建一个子目录lib，目录结构如下
+++—-resources
++——–css
++——–js
++———-lib
++——–static
++———-html
+在css目录添加了bootstrap.min.css，在js/lib添加了bootstrap.min.js和jquery.mini.js，在static下面添加了test.html，并在static/html下也添加了一个test.html，两个html内容不一致，同时在html页面引用相应的静态资源</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
 <span class="nt">&lt;head&gt;</span>
-    <span class="nt">&lt;title&gt;</span>Hello World<span class="nt">&lt;/title&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Title<span class="nt">&lt;/title&gt;</span>
+    <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"/bootstrap.min.css"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/lib/jquery.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
 <span class="nt">&lt;/head&gt;</span>
 <span class="nt">&lt;body&gt;</span>
-Hello,${name}
+dasfdasfdasgasdg
 <span class="nt">&lt;/body&gt;</span>
 <span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+<p>这时候如果没有配置静态资源访问，在对静态内容进行访问的时候会出现404错误
+这时候我们就需要添加一些配置来完成静态资源的访问，我们在application.properties文件中添加部分配置项</p>
+<blockquote>
+  <p>spring.mvc.static-path-pattern=/**
+spring.resources.static-locations=classpath:/static/,classpath:/js/,classpath:/css/</p>
+</blockquote>
+
+<p>第一行表示我们将对所有请求的静态资源进行过滤，经过实践证明这段配置可添加可不添加
+第二行配置，可以看出来我们是将static、js、css目录标记为静态资源目录，多个目录之间通过逗号隔开如果你有更多的静态资源目录添加相应的路径即可
+有了第二行配置，你在页面中引入的js、css就能被正确的识别而不再是报404错误了
+当你在Controller中想跳转到静态html界面可以采用forward或者redirect的方式跳转例如：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">hw</span><span class="p">.</span><span class="n">myp2c</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">controller</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">stereotype</span><span class="p">.</span><span class="n">Controller</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">ui</span><span class="p">.</span><span class="k">Model</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">bind</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">GetMapping</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">bind</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">RequestMapping</span><span class="p">;</span>
+
+<span class="p">@</span><span class="n">Controller</span>
+<span class="p">@</span><span class="n">RequestMapping</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+<span class="k">public</span> <span class="n">class</span> <span class="n">MainController</span> <span class="p">{</span>
+
+    <span class="p">@</span><span class="n">GetMapping</span>
+    <span class="k">public</span> <span class="k">String</span> <span class="n">main</span><span class="p">(</span><span class="k">Model</span> <span class="k">model</span><span class="p">){</span>
+        <span class="k">model</span><span class="p">.</span><span class="n">addAttribute</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span><span class="s2">"Welcome Thymeleaf!"</span><span class="p">);</span>
+        <span class="n">return</span> <span class="s2">"forward:/test.html"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 
 </code></pre></div></div>
-<p>下一步就是进入命令行，从命令行进入项目目录然后用maven启动项目</p>
-<blockquote>
-  <p>mvn spring-boot:run</p>
-</blockquote>
   
 	</div>
 	<footer class="article-footer clearfix">
@@ -329,7 +215,7 @@ Hello,${name}
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://localhost:4000/spring/2017/10/05/Spring-Boot%E5%88%9D%E4%BD%93%E9%AA%8C/" data-title="Spring Boot初体验 | jackycheng86小站" data-tsina="" class="share clearfix">
+	  <div data-url="http://localhost:4000/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/" data-title="Spring Boot使用静态资源 | jackycheng86小站" data-tsina="" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -342,18 +228,18 @@ Hello,${name}
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/gentoo/2017/10/05/Gentoo%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" title="Gentoo安装配置">
+ <a href="/spring/2017/10/05/Spring-Boot%E5%88%9D%E4%BD%93%E9%AA%8C/" title="Spring Boot初体验">
   <strong>上一篇：</strong><br/>
   <span>
-  Gentoo安装配置</span>
+  Spring Boot初体验</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/"  title="Spring Boot使用静态资源">
+<a href="/java/2017/11/05/%E5%90%91filter%E8%BF%87%E6%BB%A4%E5%99%A8%E4%B8%AD%E7%9A%84request%E5%AF%B9%E8%B1%A1%E6%B7%BB%E5%8A%A0%E9%A2%9D%E5%A4%96%E7%9A%84%E5%8F%82%E6%95%B0/"  title="向filter过滤器中的request对象添加额外的参数">
  <strong>下一篇：</strong><br/> 
- <span>Spring Boot使用静态资源
+ <span>向filter过滤器中的request对象添加额外的参数
 </span>
 </a>
 </div>
