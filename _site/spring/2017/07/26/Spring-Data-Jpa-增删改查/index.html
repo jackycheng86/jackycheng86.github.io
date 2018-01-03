@@ -8,7 +8,7 @@
     
     
     
-    <title>Java 解析PDF内容 | jackycheng86小站</title>
+    <title>Spring Data JPA 增删改查 | jackycheng86小站</title>
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
@@ -23,12 +23,12 @@
     
     <meta property="og:type" content="article">
     
-    <meta property="og:title" content="Java 解析PDF内容">
-    <meta property="og:url" content="/java/2017/12/03/Java-%E8%A7%A3%E6%9E%90pdf%E5%86%85%E5%AE%B9/">
+    <meta property="og:title" content="Spring Data JPA 增删改查">
+    <meta property="og:url" content="/spring/2017/07/26/Spring-Data-Jpa-%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/">
     <meta property="og:site_name" content="jackycheng86小站">
     <meta property="og:description" content="">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Java 解析PDF内容">
+    <meta name="twitter:title" content="Spring Data JPA 增删改查">
     <meta name="twitter:description" content="page.description">
     <meta name="twitter:creator" content="@">
     <link rel="publisher" href="">
@@ -97,14 +97,14 @@
 	<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/java/2017/12/03/Java-%E8%A7%A3%E6%9E%90pdf%E5%86%85%E5%AE%B9/" title="Java 解析PDF内容" itemprop="url">Java 解析PDF内容</a>
+      <a href="/spring/2017/07/26/Spring-Data-Jpa-%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/" title="Spring Data JPA 增删改查" itemprop="url">Spring Data JPA 增删改查</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="jacky" target="_blank" itemprop="author">jacky</a>
 		
   <p class="article-time">
-    <time datetime="2017-12-03 00:00:00 +0800" itemprop="datePublished"> 发表于 2017-12-03</time>
+    <time datetime="2017-07-26 00:00:00 +0800" itemprop="datePublished"> 发表于 2017-07-26</time>
     
   </p>
 </header>
@@ -116,131 +116,237 @@
 		
 		</div>
 		
-		<p>最近遇到一个老师有点小需求，需要读取一些pdf的内容到数据库里面进行检索，因为一直都在合作所以找到了我。
-百度了一下发现在java下解决pdf内容解析的办法也有不少，我选了apache的pdfbox来做pdf的内容解析工作，<a href="https://pdfbox.apache.org/">pdfbox官网</a>
-开发环境</p>
+		<p>Spring Data是Spring提供的对数据库的访问方式而Spring Data JPA是Spring Data的一部分，是JPA的Spring 实现方案。通过Spring Data JPA可以很方便的利用spring-framew构建基于数据库的应用程序。
+Spring Data JPA是JPA的spring实现因此包含了很多详细的应用方式，特别是各种类型的查询检索方式，本文只是简单的涉及数据库的增删改查也就是CRUD操作。</p>
 <blockquote>
-  <p>spring boot</p>
+  <p>代码环境：maven+spring-boot</p>
 </blockquote>
 
-<p>先看pom.xml</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
-<span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
-	<span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="nt">&gt;</span>
-	<span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
-
-	<span class="nt">&lt;groupId&gt;</span>com.pdf<span class="nt">&lt;/groupId&gt;</span>
-	<span class="nt">&lt;artifactId&gt;</span>pdf<span class="nt">&lt;/artifactId&gt;</span>
-	<span class="nt">&lt;version&gt;</span>0.0.1-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
-	<span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
-
-	<span class="nt">&lt;name&gt;</span>pdf<span class="nt">&lt;/name&gt;</span>
-	<span class="nt">&lt;description&gt;</span>Demo project for Spring Boot<span class="nt">&lt;/description&gt;</span>
-
-	<span class="nt">&lt;parent&gt;</span>
-		<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-		<span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-parent<span class="nt">&lt;/artifactId&gt;</span>
-		<span class="nt">&lt;version&gt;</span>1.5.8.RELEASE<span class="nt">&lt;/version&gt;</span>
-		<span class="nt">&lt;relativePath/&gt;</span> <span class="c">&lt;!-- lookup parent from repository --&gt;</span>
-	<span class="nt">&lt;/parent&gt;</span>
-
-	<span class="nt">&lt;properties&gt;</span>
-		<span class="nt">&lt;project.build.sourceEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.build.sourceEncoding&gt;</span>
-		<span class="nt">&lt;project.reporting.outputEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.reporting.outputEncoding&gt;</span>
-		<span class="nt">&lt;java.version&gt;</span>1.8<span class="nt">&lt;/java.version&gt;</span>
-	<span class="nt">&lt;/properties&gt;</span>
-
-	<span class="nt">&lt;dependencies&gt;</span>
-		<span class="nt">&lt;dependency&gt;</span>
-			<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-			<span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="nt">&lt;/artifactId&gt;</span>
-		<span class="nt">&lt;/dependency&gt;</span>
-
-		<span class="nt">&lt;dependency&gt;</span>
-			<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-			<span class="nt">&lt;artifactId&gt;</span>spring-boot-devtools<span class="nt">&lt;/artifactId&gt;</span>
-			<span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
-		<span class="nt">&lt;/dependency&gt;</span>
-		<span class="nt">&lt;dependency&gt;</span>
-			<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-			<span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-test<span class="nt">&lt;/artifactId&gt;</span>
-			<span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
-		<span class="nt">&lt;/dependency&gt;</span>
-
-        <span class="nt">&lt;dependency&gt;</span>
-            <span class="nt">&lt;groupId&gt;</span>org.apache.pdfbox<span class="nt">&lt;/groupId&gt;</span>
-            <span class="nt">&lt;artifactId&gt;</span>pdfbox<span class="nt">&lt;/artifactId&gt;</span>
-            <span class="nt">&lt;version&gt;</span>2.0.4<span class="nt">&lt;/version&gt;</span>
-        <span class="nt">&lt;/dependency&gt;</span>
-        <span class="c">&lt;!-- https://mvnrepository.com/artifact/org.apache.pdfbox/fontbox --&gt;</span>
-        <span class="nt">&lt;dependency&gt;</span>
-            <span class="nt">&lt;groupId&gt;</span>org.apache.pdfbox<span class="nt">&lt;/groupId&gt;</span>
-            <span class="nt">&lt;artifactId&gt;</span>fontbox<span class="nt">&lt;/artifactId&gt;</span>
-            <span class="nt">&lt;version&gt;</span>2.0.8<span class="nt">&lt;/version&gt;</span>
-        <span class="nt">&lt;/dependency&gt;</span>
-
-    <span class="nt">&lt;/dependencies&gt;</span>
-
-	<span class="nt">&lt;build&gt;</span>
-		<span class="nt">&lt;plugins&gt;</span>
-			<span class="nt">&lt;plugin&gt;</span>
-				<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-				<span class="nt">&lt;artifactId&gt;</span>spring-boot-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
-			<span class="nt">&lt;/plugin&gt;</span>
-		<span class="nt">&lt;/plugins&gt;</span>
-	<span class="nt">&lt;/build&gt;</span>
-
-
-<span class="nt">&lt;/project&gt;</span>
-
+<p>首先需要在pom.xml引入依赖项</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+		&lt;/dependency&gt;
 </code></pre></div></div>
-<p>我做测试的是偶pdfbox最新版本为2.0.4现在可能有更新的版本，自己按照需要进行修改吧。
-我这里做的测试是从pdf解析出文本数据，然后再将解析出来的文本数据保存到一个txt文本，贴代码</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Test
-	public void pdfTest() {
-        try {
-            // 是否排序
-            boolean sort = false;
-            // 开始提取页数
-            int startPage = 1;
-            // 结束提取页数
-            int endPage = Integer.MAX_VALUE;
-            String content = null;
-            PrintWriter writer = null;
-            //pdf文本路径
-            String path = "/home/jacky/upload-dir/test.pdf";
-            //输出txt文本路径
-            String target="/home/jacky/upload-dir/test.txt";
-            PDDocument document = PDDocument.load(new File(path));
-            PDFTextStripper pts = new PDFTextStripper();
-            endPage = document.getNumberOfPages();
-            System.out.println("Total Page: " + endPage);
-            pts.setStartPage(startPage);
-            pts.setEndPage(endPage);
-            try {
-            	//content就是从pdf中解析出来的文本
-                content = pts.getText(document);
-                writer = new PrintWriter(new FileOutputStream(target));
-                writer.write(content);// 写入文件内容
-                writer.flush();
-                writer.close();
-            } catch (Exception e) {
-                throw e;
-            }finally {
-                if (null != document)
-                    document.close();
-            }
-            System.out.println("Get PDF Content ...");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+<p>至于数据库的配置就不再过多的赘述可参见我前面的文章http://blog.csdn.net/tyyytcj/article/details/76100682
+##实体映射
+使用jpa首先需要建立实体类与数据库之间的映射关系</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Entity
+@Table(name = "SECONDLEVEL", schema = "MATERIAL", catalog = "")
+public class SecondlevelEntity {
+    private String code;
+    private String name;
+    private String sLinks;//操作链接
+    private String dataIntegrity;
+    private int dataIdCount;
+    @Id
+    @Column(name = "CODE", nullable = false, length = 10)
+    public String getCode() {
+        return code;映射
+    }
+    public void setCode(String code) {
+        this.code = code;
+    }
+    @Basic
+    @Column(name = "NAME", nullable = false, length = 30)
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    @Transient
+    public String getsLinks() {
+        return "&lt;a href='javascript:void(0);' onclick='material_UpdateLb(\"" + this.code + "\");'&gt;编辑&lt;/a&gt;" +
+                "&amp;nbsp;&amp;nbsp;&lt;a href='javascript:void(0);' onclick='material_DeleteLb(\"" + this.code + "\");'&gt;删除&lt;/a&gt;";
+    }
+    public void setsLinks(String sLinks) {
+        this.sLinks = sLinks;
+    }
+    @Transient
+    public String getDataIntegrity() {
+        return dataIntegrity;
+    }
+    public void setDataIntegrity(String dataIntegrity) {
+        this.dataIntegrity = dataIntegrity;
+    }
+    @Transient
+    public int getDataIdCount() {
+        return dataIdCount;
+    }
+    public void setDataIdCount(int dataIdCount) {
+        this.dataIdCount = dataIdCount;
     }
 </code></pre></div></div>
-<p>这样我们就完成了一个简单的解析pdf文本的测试，但是请注意我这里示例的pdf保存的是文本类型的内容而不是图片形式的文本内容。我这里只是简单的介绍了一下pdfbox读取文本格式的内容，官方的svn代码提供了很多的demo，所以可以checkout一下官方的示例代码</p>
 <blockquote>
-  <p>svn checkout http://svn.apache.org/repos/asf/pdfbox/trunk/examples</p>
+  <p>@Entity 注解在数据源配置的时候由spring自动进行扫描并创建相应的实体映射
+@Table 注解用于标明与数据库对应的表名数据库
+@Id 注解说明该属性作为该表的主键
+@Column 注解说明该属性对应的列名
+@Basic 表示一个简单的属性到数据库表的字段的映射
+@Transient 表示注解的该属性并非与该表中的任何一个字段进行映射</p>
 </blockquote>
 
+<p>#构建Repository
+完成实体映射后将构建DAO接口，spring data jpa采用接口的方式声明相应的数据库操作方法并且提供了部分基础的数据库操作方法包括save、findOne、findAll、update、delete等方法，通过查询方法还提供了分页查询的功能</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//spring data jpa 提供了多个接口并封装了部分数据库操作方法，具体可参见下面代码
+    List&lt;T&gt; findAll();
+    List&lt;T&gt; findAll(Sort sort);
+    List&lt;T&gt; findAll(Iterable&lt;ID&gt; iterable);
+    &lt;S extends T&gt; List&lt;S&gt; save(Iterable&lt;S&gt; iterable);
+    void flush();
+    &lt;S extends T&gt; S saveAndFlush(S s);
+    void deleteInBatch(Iterable&lt;T&gt; iterable);
+    void deleteAllInBatch();
+    T getOne(ID id);
+    &lt;S extends T&gt; List&lt;S&gt; findAll(Example&lt;S&gt; example);
+    &lt;S extends T&gt; List&lt;S&gt; findAll(Example&lt;S&gt; example, Sort sort);
+    Page&lt;T&gt; findAll(Pageable pageable);
+    &lt;S extends T&gt; S save(S s);
+    T findOne(ID id);
+    boolean exists(ID id);
+    long count();
+    void delete(ID id);
+    void delete(T t);
+    void delete(Iterable&lt;? extends T&gt; iterable);
+    void deleteAll();
+    &lt;S extends T&gt; S findOne(Example&lt;S&gt; example);
+    &lt;S extends T&gt; Page&lt;S&gt; findAll(Example&lt;S&gt; example, Pageable pageable);
+    &lt;S extends T&gt; long count(Example&lt;S&gt; example);
+    &lt;S extends T&gt; boolean exists(Example&lt;S&gt; example);
+</code></pre></div></div>
+<p>结合自己的业务需求生成自己的Repository并集成框架本身提供的接口就能拥有框架本身提供的数据库访问功能，针对具体的应用情况声明了特定的查询方法，针对各种简单查询复杂查询的描述请参见spring data jpa官方手册http://docs.spring.io/spring-data/jpa/docs/1.11.4.RELEASE/reference/html/</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Repository
+public interface SecondlevelDao extends MyBaseRepository&lt;SecondlevelEntity, String&gt; {
+
+    /**
+     * 分页获取信息
+     * @param pageable
+     * @return
+     */
+    @Override
+    Page&lt;SecondlevelEntity&gt; findAll(Pageable pageable);
+
+    /**
+     * 分页获取信息，并添加特定的查询参数条件
+     * @param code
+     * @param name
+     * @param pageable
+     * @return
+     */
+    Page&lt;SecondlevelEntity&gt; findByCodeOrName(String code, String name, Pageable pageable);
+</code></pre></div></div>
+<p>##增/删/改/查
+增、删、改、查都是在业务类中完成具体操作，下面贴出业务类代码并进行描述</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Service
+@Transactional(readOnly = true)
+@CacheConfig
+public class SecondlevelServiceImpl implements SecondlevelService {
+    @Autowired
+    private SecondlevelDao secondlevelDao;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    /**
+     * 不含查询条件的分页获取数据
+     *
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    @Override
+    @Cacheable(value = "secondlevels", key = "#a0")
+    public Page&lt;SecondlevelEntity&gt; findAll(int pageNo, int pageSize) throws Exception {
+        try {
+            return secondlevelDao.findAll(new PageRequest(pageNo, pageSize, new Sort(Sort.Direction.ASC, "code")));
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            return null;
+        }
+    }
+    /**
+     * 新增数据
+     *
+     * @param secondlevelEntity
+     * @throws Exception
+     */
+    @Override
+    @Transactional
+    @CacheEvict(cacheNames="secondlevels",allEntries = true)
+    public void save(SecondlevelEntity secondlevelEntity) throws Exception {
+        try {
+            secondlevelDao.save(secondlevelEntity);
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+        }
+    }
+
+    /**
+     * 更新数据
+     *
+     * @param secondlevelEntity
+     * @throws Exception
+     */
+    @Override
+    @Transactional
+    @Modifying
+    @CacheEvict(cacheNames="secondlevels",allEntries = true)
+    public void update(SecondlevelEntity secondlevelEntity) throws Exception {
+        try {
+            SecondlevelEntity secondlevelEntity1 = secondlevelDao.findOne(secondlevelEntity.getCode());
+            secondlevelEntity1.setName(secondlevelEntity.getName());
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+        }
+    }
+    /**
+     * 删除指定数据
+     *
+     * @param code
+     * @throws Exception
+     */
+    @Override
+    @Transactional
+    @Modifying
+    @CacheEvict(cacheNames="secondlevels",allEntries = true)
+    public void delete(String code) throws Exception {
+        try {
+            SecondlevelEntity s=this.findOne(code);
+            System.out.println(s.getCode());
+            secondlevelDao.delete(s);
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+        }
+    }
+}
+</code></pre></div></div>
+<blockquote>
+  <p>@Service 注解该类为业务逻辑类由spring容器进行管理
+@Transactional(readOnly = true) 指定默认的事务类别（只读）
+@CacheConfig 配置了spring内置缓存来缓存常用查询数据</p>
+
+  <p>findAll() 方法一个简单的查询所有条目的方法（有分页功能）
+@Cacheable(value = “secondlevels”, key = “#a0”) 配置了缓存并指定方法第一个参数为缓存的key</p>
+
+  <p>save() 方法用于保存新增数据配置了多个注解
+@Transactional 配置方法的自定义事务级别
+@Modifying 定义事务为修改
+@CacheEvict(cacheNames=”secondlevels”,allEntries = true) 清除所有缓存使新增的数据能够被查到</p>
+
+  <p>update() 方法用于更新实体信息，spring data jpa对于数据的更新还有query update这种基于类sql的方式，这里我们不采用这种方式，我们采用的方式更简单update方法参数中包含了待更新实体的唯一标识，通过标识将原本的实体查询出来再将需要修改的属性值传递到查询中的实体就完成了数据库数据的更新十分简单
+@Transactional 配置方法的自定义事务级别
+@Modifying 定义事务为修改
+@CacheEvict(cacheNames=”secondlevels”,allEntries = true) 清除所有缓存使修改的数据得到更新</p>
+
+  <p>delete() 方法用于删除指定数据，由于delete方法删除的是实体，如果传递的参数不是实体那么需要先将待删除实体查询出来再进行删除</p>
+  <blockquote>
+    <p>@Transactional 配置方法的自定义事务级别
+@Modifying 定义事务为修改
+@CacheEvict(cacheNames=”secondlevels”,allEntries = true) 清楚所有缓存使删除的数据更新</p>
+  </blockquote>
+
+  <p>至此spring data jpa的简单的增、删、改、查介绍完毕！
+至于详细的查询请参考spring data jpa的官方文档</p>
+</blockquote>
   
 	</div>
 	<footer class="article-footer clearfix">
@@ -257,7 +363,7 @@
   }) %>
   -->
   
-  <a class="article-category-link" href="/categories/#Java">Java</a>
+  <a class="article-category-link" href="/categories/#Spring">Spring</a>
   
 </div>
 
@@ -271,6 +377,10 @@
   <span></span> <!--<%- tags.join('') %>-->
   
   
+  <a href="/tags/#Spring Boot">Spring Boot</a>
+  
+  <a href="/tags/#Spring">Spring</a>
+  
   <a href="/tags/#Java">Java</a>
   
   </div>
@@ -281,7 +391,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://localhost:4000/java/2017/12/03/Java-%E8%A7%A3%E6%9E%90pdf%E5%86%85%E5%AE%B9/" data-title="Java 解析PDF内容 | jackycheng86小站" data-tsina="" class="share clearfix">
+	  <div data-url="http://localhost:4000/spring/2017/07/26/Spring-Data-Jpa-%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/" data-title="Spring Data JPA 增删改查 | jackycheng86小站" data-tsina="" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -293,14 +403,14 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/spring/2017/11/24/Spring-Boot-%E4%BD%BF%E7%94%A8wangEditor%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0/" title="Spring Boot 使用wangEditor实现图片上传">
-  <strong>上一篇：</strong><br/>
-  <span>
-  Spring Boot 使用wangEditor实现图片上传</span>
+
+<div class="next">
+<a href="/spring/2017/09/25/Spring-Data-Jpa%E6%9C%AC%E5%9C%B0%E6%9F%A5%E8%AF%A2-%E5%B8%A6%E5%88%86%E9%A1%B5%E6%96%B9%E5%BC%8F/"  title="Spring Data Jpa本地查询（带分页方式）">
+ <strong>下一篇：</strong><br/> 
+ <span>Spring Data Jpa本地查询（带分页方式）
+</span>
 </a>
 </div>
-
 
 </nav>
 

@@ -1,0 +1,871 @@
+
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+    
+    
+    
+    
+    <title>Spring Boot使用Thymeleaf | jackycheng86小站</title>
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="jacky">
+    
+
+    
+    <!--<%- open_graph({twitter_id: theme.author.twitter, google_plus: theme.author.google_plus}) %>-->
+
+    <meta name="description" content="page.description">
+    
+    <meta property="og:type" content="article">
+    
+    <meta property="og:title" content="Spring Boot使用Thymeleaf">
+    <meta property="og:url" content="/spring/2017/10/17/Spring-Boot-%E4%BD%BF%E7%94%A8Thymeleaf/">
+    <meta property="og:site_name" content="jackycheng86小站">
+    <meta property="og:description" content="">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Spring Boot使用Thymeleaf">
+    <meta name="twitter:description" content="page.description">
+    <meta name="twitter:creator" content="@">
+    <link rel="publisher" href="">
+
+    
+    <link rel="alternative" href="/atom.xml" title="jackycheng86小站" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/assets/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/assets/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/jacman.jpg">
+    
+
+    <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/assets/css/highlight.css" type="text/css">
+    
+    
+</head>
+
+  <body>
+    <header>
+        <div>
+		    
+			<div id="imglogo">
+				<a href="/"><img src="/assets/img/logo.png" alt="jackycheng86小站" title="jackycheng86小站"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="jackycheng86小站">jackycheng86小站</a></h1>
+				<h2 class="blog-motto">个人积累</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search" method="get" accept-charset="utf-8">
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>
+</div>
+
+    </header>
+    <div id="container">
+      
+
+
+
+<div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+	<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/spring/2017/10/17/Spring-Boot-%E4%BD%BF%E7%94%A8Thymeleaf/" title="Spring Boot使用Thymeleaf" itemprop="url">Spring Boot使用Thymeleaf</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="jacky" target="_blank" itemprop="author">jacky</a>
+		
+  <p class="article-time">
+    <time datetime="2017-10-17 00:00:00 +0800" itemprop="datePublished"> 发表于 2017-10-17</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article toc-content" style="display: none;">
+		
+			<!--<%- toc(item.content) %>-->
+		
+		</div>
+		
+		<p>之前给大家介绍了在spring boot开发中使用jsp模板，但是jsp目前并不是spring boot推荐的做法，同时使用jsp还有一些限制而Thymeleaf则是spring boot官方推荐的模板引擎。
+对于Thymeleaf我就不过多介绍网上资料很多，我们直接进入正题，在spring boot中使用Thymeleaf
+开发环境</p>
+<blockquote>
+  <p>spring boot  + Themeleaf 3</p>
+</blockquote>
+
+<p>先上pom.xml<br /></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        &lt;!-- https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.thymeleaf&lt;/groupId&gt;
+            &lt;artifactId&gt;thymeleaf&lt;/artifactId&gt;
+            &lt;version&gt;3.0.8.RELEASE&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;!-- https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf-spring4 --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.thymeleaf&lt;/groupId&gt;
+            &lt;artifactId&gt;thymeleaf-spring4&lt;/artifactId&gt;
+            &lt;version&gt;3.0.8.RELEASE&lt;/version&gt;
+        &lt;/dependency&gt;
+</code></pre></div></div>
+
+<p>我在这里并没有引入spring boot 官方的thymeleaf包</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-thymeleaf&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+</code></pre></div></div>
+
+<p>而是引入Thymeleaf的包</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!-- https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.thymeleaf&lt;/groupId&gt;
+            &lt;artifactId&gt;thymeleaf&lt;/artifactId&gt;
+            &lt;version&gt;3.0.8.RELEASE&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;!-- https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf-spring4 --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.thymeleaf&lt;/groupId&gt;
+            &lt;artifactId&gt;thymeleaf-spring4&lt;/artifactId&gt;
+            &lt;version&gt;3.0.8.RELEASE&lt;/version&gt;
+        &lt;/dependency&gt;
+</code></pre></div></div>
+<p>因为目前spring boot官方的依然引入的是thymeleaf 2.1.5这个版本的包而不是最新的3.0.8，而Thymeleaf 2 和Thymeleaf 3之间的差别比较大。</p>
+
+<p>引入好包之后我们就可以开始进行配置了，首先是spring boot的主类</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">hw</span><span class="p">.</span><span class="n">myp2c</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">boot</span><span class="p">.</span><span class="n">SpringApplication</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">boot</span><span class="p">.</span><span class="n">autoconfigure</span><span class="p">.</span><span class="n">SpringBootApplication</span><span class="p">;</span>
+
+<span class="p">@</span><span class="n">SpringBootApplication</span>
+<span class="k">public</span> <span class="n">class</span> <span class="n">Myp2cMainApplication</span> <span class="p">{</span>
+
+	<span class="k">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="k">String</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">SpringApplication</span><span class="p">.</span><span class="nf">run</span><span class="p">(</span><span class="n">Myp2cMainApplication</span><span class="p">.</span><span class="n">class</span><span class="p">,</span> <span class="n">args</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">hw</span><span class="p">.</span><span class="n">myp2c</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">boot</span><span class="p">.</span><span class="n">builder</span><span class="p">.</span><span class="n">SpringApplicationBuilder</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">boot</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">support</span><span class="p">.</span><span class="n">SpringBootServletInitializer</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="n">class</span> <span class="n">ServletInitializer</span> <span class="n">extends</span> <span class="n">SpringBootServletInitializer</span> <span class="p">{</span>
+
+	<span class="p">@</span><span class="n">Override</span>
+	<span class="n">protected</span> <span class="n">SpringApplicationBuilder</span> <span class="n">configure</span><span class="p">(</span><span class="n">SpringApplicationBuilder</span> <span class="n">application</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">return</span> <span class="n">application</span><span class="p">.</span><span class="n">sources</span><span class="p">(</span><span class="n">Myp2cMainApplication</span><span class="p">.</span><span class="n">class</span><span class="p">);</span>
+	<span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>很简单的控制类</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">hw</span><span class="p">.</span><span class="n">myp2c</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">controller</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">stereotype</span><span class="p">.</span><span class="n">Controller</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">ui</span><span class="p">.</span><span class="k">Model</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">bind</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">GetMapping</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">bind</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">RequestMapping</span><span class="p">;</span>
+
+<span class="p">@</span><span class="n">Controller</span>
+<span class="p">@</span><span class="n">RequestMapping</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+<span class="k">public</span> <span class="n">class</span> <span class="n">MainController</span> <span class="p">{</span>
+
+    <span class="p">@</span><span class="n">GetMapping</span>
+    <span class="k">public</span> <span class="k">String</span> <span class="n">main</span><span class="p">(</span><span class="k">Model</span> <span class="k">model</span><span class="p">){</span>
+        <span class="k">model</span><span class="p">.</span><span class="n">addAttribute</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span><span class="s2">"Welcome Thymeleaf!"</span><span class="p">);</span>
+        <span class="n">return</span> <span class="s2">"main"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<p>然后是Thymeleaf的模板html文件，注意目录是在main下建立以下目录webapp/WEB-INF/templates，所有的html模板都放在templates下面供Thymeleaf引擎解析</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">xmlns:th=</span><span class="s">"http://www.thymeleaf.org"</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Good Thymes Virtual Grocery<span class="nt">&lt;/title&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">"Content-Type"</span> <span class="na">content=</span><span class="s">"text/html; charset=UTF-8"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+
+<span class="nt">&lt;body&gt;</span>
+
+<span class="nt">&lt;p</span> <span class="na">th:text=</span><span class="s">"'Hello, ' + ${w} + '!'"</span> <span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/body&gt;</span>
+
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+<p>好了这是我们需要建立的各类文件，下面我们来做一些配置让spring boot识别并整合ThymeleafThymeleaf的配置有两种方法：</p>
+<blockquote>
+  <p>application.properties配置
+javabean配置</p>
+</blockquote>
+
+<p>两种方法各有优势，如果仅仅是想简单的使用Thymeleaf那就用第一种配置方法，如果想进行一些定制化的配置那就采用第二种方法
+首先我们介绍第一种配置方法，很简单就是在application.properties文件中添加如下内容就行了</p>
+
+<blockquote>
+  <p>spring.thymeleaf.cache=true
+spring.thymeleaf.check-template=true
+spring.thymeleaf.check-template-location=true
+spring.thymeleaf.enabled=true
+spring.thymeleaf.encoding=UTF-8
+spring.thymeleaf.mode=HTML
+spring.thymeleaf.prefix=/WEB-INF/templates/
+spring.thymeleaf.suffix=.html</p>
+</blockquote>
+
+<p>这样我们就配置好了直接执行mvn spring-boot:run测试运行结果</p>
+<blockquote>
+  <p>Hello, Welcome Thymeleaf!!</p>
+</blockquote>
+
+<p>下面我们介绍第二种配置方法，基于javabean的配置，首先我们创建一个类SpringWebConfig.class，在这个类里面完成Thymeleaf的配置</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">hw</span><span class="p">.</span><span class="n">myp2c</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">beans</span><span class="p">.</span><span class="n">BeansException</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">ApplicationContext</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">ApplicationContextAware</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">Bean</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">ComponentScan</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">Configuration</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">support</span><span class="p">.</span><span class="n">ResourceBundleMessageSource</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">servlet</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">EnableWebMvc</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">servlet</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">ResourceHandlerRegistry</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">servlet</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">WebMvcConfigurerAdapter</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">thymeleaf</span><span class="p">.</span><span class="n">spring4</span><span class="p">.</span><span class="n">SpringTemplateEngine</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">thymeleaf</span><span class="p">.</span><span class="n">spring4</span><span class="p">.</span><span class="n">templateresolver</span><span class="p">.</span><span class="n">SpringResourceTemplateResolver</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">thymeleaf</span><span class="p">.</span><span class="n">spring4</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">ThymeleafViewResolver</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">thymeleaf</span><span class="p">.</span><span class="n">templatemode</span><span class="p">.</span><span class="n">TemplateMode</span><span class="p">;</span>
+
+<span class="p">@</span><span class="n">Configuration</span>
+<span class="p">@</span><span class="n">EnableWebMvc</span>
+<span class="p">@</span><span class="n">ComponentScan</span>
+<span class="k">public</span> <span class="n">class</span> <span class="n">SpringWebConfig</span> <span class="n">extends</span> <span class="n">WebMvcConfigurerAdapter</span> <span class="n">implements</span> <span class="n">ApplicationContextAware</span><span class="p">{</span>
+
+    <span class="n">private</span> <span class="n">ApplicationContext</span> <span class="n">applicationContext</span><span class="p">;</span>
+
+
+    <span class="k">public</span> <span class="n">SpringWebConfig</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">super</span><span class="p">();</span>
+    <span class="p">}</span>
+
+
+    <span class="k">public</span> <span class="n">void</span> <span class="n">setApplicationContext</span><span class="p">(</span><span class="n">final</span> <span class="n">ApplicationContext</span> <span class="n">applicationContext</span><span class="p">)</span>
+            <span class="n">throws</span> <span class="n">BeansException</span> <span class="p">{</span>
+        <span class="n">this</span><span class="p">.</span><span class="n">applicationContext</span> <span class="p">=</span> <span class="n">applicationContext</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="p">/*</span> <span class="p">*******************************************************************</span> <span class="p">*/</span>
+    <span class="p">/*</span>  <span class="n">GENERAL</span> <span class="n">CONFIGURATION</span> <span class="n">ARTIFACTS</span>                                    <span class="p">*/</span>
+    <span class="p">/*</span>  <span class="n">Static</span> <span class="n">Resources</span><span class="p">,</span> <span class="n">i18n</span> <span class="n">Messages</span><span class="p">,</span> <span class="n">Formatters</span> <span class="p">(</span><span class="n">Conversion</span> <span class="n">Service</span><span class="p">)</span>   <span class="p">*/</span>
+    <span class="p">/*</span> <span class="p">*******************************************************************</span> <span class="p">*/</span>
+
+    <span class="p">@</span><span class="n">Override</span>
+    <span class="k">public</span> <span class="n">void</span> <span class="n">addResourceHandlers</span><span class="p">(</span><span class="n">final</span> <span class="n">ResourceHandlerRegistry</span> <span class="n">registry</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">super</span><span class="p">.</span><span class="n">addResourceHandlers</span><span class="p">(</span><span class="n">registry</span><span class="p">);</span>
+        <span class="n">registry</span><span class="p">.</span><span class="n">addResourceHandler</span><span class="p">(</span><span class="s2">"/images/**"</span><span class="p">).</span><span class="n">addResourceLocations</span><span class="p">(</span><span class="s2">"/images/"</span><span class="p">);</span>
+        <span class="n">registry</span><span class="p">.</span><span class="n">addResourceHandler</span><span class="p">(</span><span class="s2">"/css/**"</span><span class="p">).</span><span class="n">addResourceLocations</span><span class="p">(</span><span class="s2">"/css/"</span><span class="p">);</span>
+        <span class="n">registry</span><span class="p">.</span><span class="n">addResourceHandler</span><span class="p">(</span><span class="s2">"/js/**"</span><span class="p">).</span><span class="n">addResourceLocations</span><span class="p">(</span><span class="s2">"/js/"</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="p">@</span><span class="n">Bean</span>
+    <span class="k">public</span> <span class="n">ResourceBundleMessageSource</span> <span class="n">messageSource</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">ResourceBundleMessageSource</span> <span class="n">messageSource</span> <span class="p">=</span> <span class="n">new</span> <span class="n">ResourceBundleMessageSource</span><span class="p">();</span>
+        <span class="n">messageSource</span><span class="p">.</span><span class="n">setBasename</span><span class="p">(</span><span class="s2">"Messages"</span><span class="p">);</span>
+        <span class="n">return</span> <span class="n">messageSource</span><span class="p">;</span>
+    <span class="p">}</span>
+
+
+
+    <span class="p">@</span><span class="n">Bean</span>
+    <span class="k">public</span> <span class="n">SpringResourceTemplateResolver</span> <span class="n">templateResolver</span><span class="p">(){</span>
+        <span class="p">//</span> <span class="n">SpringResourceTemplateResolver</span> <span class="n">automatically</span> <span class="n">integrates</span> <span class="k">with</span> <span class="n">Spring</span><span class="s1">'s own
+        // resource resolution infrastructure, which is highly recommended.
+        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+        templateResolver.setApplicationContext(this.applicationContext);
+        templateResolver.setPrefix("/WEB-INF/templates/");
+        templateResolver.setSuffix(".html");
+        // HTML is the default value, added here for the sake of clarity.
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+        // Template cache is true by default. Set to false if you want
+        // page to be automatically updated when modified.
+        templateResolver.setCacheable(true);
+        return templateResolver;
+    }
+
+    @Bean
+    public SpringTemplateEngine templateEngine(){
+        // SpringTemplateEngine automatically applies SpringStandardDialect and
+        // enables Spring'</span><span class="n">s</span> <span class="n">own</span> <span class="n">MessageSource</span> <span class="n">message</span> <span class="n">resolution</span> <span class="n">mechanisms</span><span class="p">.</span>
+        <span class="n">SpringTemplateEngine</span> <span class="n">templateEngine</span> <span class="p">=</span> <span class="n">new</span> <span class="n">SpringTemplateEngine</span><span class="p">();</span>
+        <span class="n">templateEngine</span><span class="p">.</span><span class="n">setTemplateResolver</span><span class="p">(</span><span class="n">templateResolver</span><span class="p">());</span>
+        <span class="p">//</span> <span class="n">Enabling</span> <span class="n">the</span> <span class="n">SpringEL</span> <span class="n">compiler</span> <span class="k">with</span> <span class="n">Spring</span> <span class="m">4.2.4</span> <span class="k">or</span> <span class="n">newer</span> <span class="n">can</span>
+        <span class="p">//</span> <span class="n">speed</span> <span class="n">up</span> <span class="n">execution</span> <span class="k">in</span> <span class="n">most</span> <span class="n">scenarios</span><span class="p">,</span> <span class="n">but</span> <span class="n">might</span> <span class="n">be</span> <span class="n">incompatible</span>
+        <span class="p">//</span> <span class="k">with</span> <span class="n">specific</span> <span class="n">cases</span> <span class="n">when</span> <span class="n">expressions</span> <span class="k">in</span> <span class="n">one</span> <span class="n">template</span> <span class="n">are</span> <span class="n">reused</span>
+        <span class="p">//</span> <span class="n">across</span> <span class="n">different</span> <span class="n">data</span> <span class="n">types</span><span class="p">,</span> <span class="n">so</span> <span class="n">this</span> <span class="n">flag</span> <span class="n">is</span> <span class="s2">"false"</span> <span class="n">by</span> <span class="n">default</span>
+        <span class="p">//</span> <span class="n">for</span> <span class="n">safer</span> <span class="n">backwards</span> <span class="n">compatibility</span><span class="p">.</span>
+        <span class="n">templateEngine</span><span class="p">.</span><span class="n">setEnableSpringELCompiler</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+        <span class="n">return</span> <span class="n">templateEngine</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="p">@</span><span class="n">Bean</span>
+    <span class="k">public</span> <span class="n">ThymeleafViewResolver</span> <span class="n">viewResolver</span><span class="p">(){</span>
+        <span class="n">ThymeleafViewResolver</span> <span class="n">viewResolver</span> <span class="p">=</span> <span class="n">new</span> <span class="n">ThymeleafViewResolver</span><span class="p">();</span>
+        <span class="n">viewResolver</span><span class="p">.</span><span class="n">setTemplateEngine</span><span class="p">(</span><span class="n">templateEngine</span><span class="p">());</span>
+        <span class="n">return</span> <span class="n">viewResolver</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div></div>
+<p>分别配置了对静态资源（js/css/images）的处理、templateResolver（模板解析器）、templateEngine（模板引擎）、viewResolver（视图解析器）</p>
+  
+	</div>
+	<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <!--
+  <%- list_categories(item.categories, {
+      show_count: false,
+      class: 'article-category',
+      style: 'none',
+      separator: '►'
+  }) %>
+  -->
+  
+  <a class="article-category-link" href="/categories/#Spring">Spring</a>
+  
+</div>
+
+
+  <div class="article-tags">
+  <!--
+  <% var tags = [];
+    item.tags.forEach(function(tag){
+      tags.push('<a href="' + config.root + tag.path + '">' + tag.name + '</a>');
+    }); %>-->
+  <span></span> <!--<%- tags.join('') %>-->
+  
+  
+  <a href="/tags/#Spring Boot">Spring Boot</a>
+  
+  <a href="/tags/#Spring">Spring</a>
+  
+  <a href="/tags/#Java">Java</a>
+  
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://localhost:4000/spring/2017/10/17/Spring-Boot-%E4%BD%BF%E7%94%A8Thymeleaf/" data-title="Spring Boot使用Thymeleaf | jackycheng86小站" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+   
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/spring/2017/10/05/Spring-Boot%E5%88%9D%E4%BD%93%E9%AA%8C/" title="Spring Boot初体验">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Spring Boot初体验</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/"  title="Spring Boot使用静态资源">
+ <strong>下一篇：</strong><br/> 
+ <span>Spring Boot使用静态资源
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+
+      
+      
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside toc-content">
+ 
+ <!--<%- toc(item.content) %>-->
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/#Spring" title="Spring">Spring<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/#Gentoo" title="Gentoo">Gentoo<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/#Java" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/#Spring Boot" title="Spring Boot">Spring Boot<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/#Spring" title="Spring">Spring<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/#Java" title="Java">Java<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/#Linux" title="Linux">Linux<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/#Gentoo" title="Gentoo">Gentoo<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div id="tagcloud" class="tagcloudlist clearfix">
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            <a href="https://coderq.com" target="_blank" title="码农圈">码农圈</a>
+          </li>
+        
+          <li>
+            <a href="http://blog.csdn.net/tyyytcj" target="_blank" title="Jacky's Blog">Jacky's Blog</a>
+          </li>
+        
+    </ul>
+</div>
+
+  
+<div class="github-card">
+<p class="asidetitle">Github 名片</p>
+<div class="github-card" data-github="https://github.com/jackycheng86" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+</div>
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I'm jacky in Sichuan Normal University. <br/>
+			This is my blog,thanks.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/https://github.com/jackycheng86" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<a href="mailto:359202057@qq.com" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+	<!--
+			<%  Array.prototype.S=String.fromCharCode(2);
+			  Array.prototype.in_array=function(e){
+    			var r=new RegExp(this.S+e+this.S);
+    			return (r.test(this.S+this.join(this.S)+this.S));
+				};
+				var cc = new Array('by','by-nc','by-nc-nd','by-nc-sa','by-nd','by-sa','zero'); %>
+		<% if (cc.in_array(theme.creative_commons) ) { %>
+				<div class="cc-license">
+          <a href="http://creativecommons.org/licenses/<%= theme.creative_commons %>/4.0" class="cc-opacity" target="_blank">
+            <img src="<%- config.root %>img/cc-<%= theme.creative_commons %>.svg" alt="Creative Commons" />
+          </a>
+        </div>
+    <% } %>
+				-->
+
+		<p class="copyright">
+		Powered by <a href="http://jekyllrb.com" target="_blank" title="jekyll">jekyll</a> and Theme by <a href="https://github.com/simpleyyt/jekyll-jacman" target="_blank" title="Jacman">Jacman</a> © 2015 
+		
+		<a href="about" target="_blank" title="jacky">jacky</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/assets/js/jquery-2.0.3.min.js"></script>
+<script src="/assets/js/jquery.imagesloaded.min.js"></script>
+<script src="/assets/js/gallery.js"></script>
+<script src="/assets/js/jquery.qrcode-0.12.0.min.js"></script>
+<script src="/assets/js/toc.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+
+  
+
+  $(window).resize(function(){
+    getSize();
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+      
+    }
+  });
+});
+</script>
+
+
+<script src="/assets/js/tagcloud.js"></script>
+<script>
+$(document).ready(function() {
+  var tags = [
+    
+    { "name": "Spring Boot", "path": "/tags/#Spring Boot", "length": 7 },
+    
+    { "name": "Spring", "path": "/tags/#Spring", "length": 7 },
+    
+    { "name": "Java", "path": "/tags/#Java", "length": 9 },
+    
+    { "name": "Linux", "path": "/tags/#Linux", "length": 1 },
+    
+    { "name": "Gentoo", "path": "/tags/#Gentoo", "length": 1 },
+    
+  ];
+  $("#tagcloud").html(tagcloudHelper(tags));
+});
+</script>
+
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $('#toc.toc-aside').toc({
+    title: "文章目录",
+    showEffect: "none"
+  });
+  $('#toc.toc-article').toc({
+    title: "文章目录",
+    showEffect: "show",
+    showSpeed: 0
+  });
+});
+</script>
+
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#nothing"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+/*
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      //$('.hoverqrcode').hide();
+  });
+  */
+});
+</script>
+
+
+
+
+
+
+<!--
+
+-->
+
+
+
+
+<link rel="stylesheet" href="/assets/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/assets/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      if ($(this).hasClass('emoji')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+});
+</script>
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/assets/img/scrollup.png"/></a>
+	</div>
+	<script src="/assets/js/totop.js"></script>
+
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
+

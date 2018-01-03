@@ -8,7 +8,7 @@
     
     
     
-    <title>Spring Boot使用静态资源 | jackycheng86小站</title>
+    <title>Spring Boot使用freemarker并且生成静态html页面 | jackycheng86小站</title>
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
@@ -23,12 +23,12 @@
     
     <meta property="og:type" content="article">
     
-    <meta property="og:title" content="Spring Boot使用静态资源">
-    <meta property="og:url" content="/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/">
+    <meta property="og:title" content="Spring Boot使用freemarker并且生成静态html页面">
+    <meta property="og:url" content="/spring/2017/10/21/Spring-Boot%E4%BD%BF%E7%94%A8freemarker%E5%B9%B6%E4%B8%94%E7%94%9F%E6%88%90%E9%9D%99%E6%80%81html%E9%A1%B5%E9%9D%A2/">
     <meta property="og:site_name" content="jackycheng86小站">
     <meta property="og:description" content="">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Spring Boot使用静态资源">
+    <meta name="twitter:title" content="Spring Boot使用freemarker并且生成静态html页面">
     <meta name="twitter:description" content="page.description">
     <meta name="twitter:creator" content="@">
     <link rel="publisher" href="">
@@ -97,14 +97,14 @@
 	<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/" title="Spring Boot使用静态资源" itemprop="url">Spring Boot使用静态资源</a>
+      <a href="/spring/2017/10/21/Spring-Boot%E4%BD%BF%E7%94%A8freemarker%E5%B9%B6%E4%B8%94%E7%94%9F%E6%88%90%E9%9D%99%E6%80%81html%E9%A1%B5%E9%9D%A2/" title="Spring Boot使用freemarker并且生成静态html页面" itemprop="url">Spring Boot使用freemarker并且生成静态html页面</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="jacky" target="_blank" itemprop="author">jacky</a>
 		
   <p class="article-time">
-    <time datetime="2017-10-18 00:00:00 +0800" itemprop="datePublished"> 发表于 2017-10-18</time>
+    <time datetime="2017-10-21 00:00:00 +0800" itemprop="datePublished"> 发表于 2017-10-21</time>
     
   </p>
 </header>
@@ -116,48 +116,45 @@
 		
 		</div>
 		
-		<p>在我们使用Spring boot进行web开发时都会遇到引入各类js、css、html、image等各种静态资源文件，这时候我们就需要进行相应的配置来允许应用访问这些静态资源。
-我们还是基于之前的采用thymeleaf 作为模板的 spring boot来开发
-<a href="http://blog.csdn.net/tyyytcj/article/details/78268310">Spring Boot使用Thymeleaf</a></p>
-
-<p>首先我们在resource目录下面建3各文件夹分别是：static、js、css，同时在static目录下建一个子目录html，在js下建一个子目录lib，目录结构如下
-++—-resources
-+——–css
-+——–js
-+———-lib
-+——–static
-+———-html
-在css目录添加了bootstrap.min.css，在js/lib添加了bootstrap.min.js和jquery.mini.js，在static下面添加了test.html，并在static/html下也添加了一个test.html，两个html内容不一致，同时在html页面引用相应的静态资源</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
-<span class="nt">&lt;head&gt;</span>
-    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;title&gt;</span>Title<span class="nt">&lt;/title&gt;</span>
-    <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"/bootstrap.min.css"</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/lib/jquery.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
-<span class="nt">&lt;/head&gt;</span>
-<span class="nt">&lt;body&gt;</span>
-dasfdasfdasgasdg
-<span class="nt">&lt;/body&gt;</span>
-<span class="nt">&lt;/html&gt;</span>
+		<p>之前我介绍了在spring boot中使用thymeleaf模板，这次我会给大家介绍在spring boot中使用freemarker模板技术，同时利用freemarker生成静态html页面。生成静态html页面就能实现网站的静态化进而提高网站的访问速度以及提高SEO能力。
+首先在pom.xml中添加依赖
+##添加依赖</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;dependency&gt;
+            &lt;groupId&gt;org.freemarker&lt;/groupId&gt;
+            &lt;artifactId&gt;freemarker&lt;/artifactId&gt;
+            &lt;version&gt;2.3.23&lt;/version&gt;
+        &lt;/dependency&gt;
 </code></pre></div></div>
-<p>这时候如果没有配置静态资源访问，在对静态内容进行访问的时候会出现404错误
-这时候我们就需要添加一些配置来完成静态资源的访问，我们在application.properties文件中添加部分配置项</p>
-<blockquote>
-  <p>spring.mvc.static-path-pattern=/**
-spring.resources.static-locations=classpath:/static/,classpath:/js/,classpath:/css/</p>
-</blockquote>
+<p>##application配置
+在application.properties中添加freemarker的配置参数</p>
 
-<p>第一行表示我们将对所有请求的静态资源进行过滤，经过实践证明这段配置可添加可不添加
-第二行配置，可以看出来我们是将static、js、css目录标记为静态资源目录，多个目录之间通过逗号隔开如果你有更多的静态资源目录添加相应的路径即可
-有了第二行配置，你在页面中引入的js、css就能被正确的识别而不再是报404错误了
-当你在Controller中想跳转到静态html界面可以采用forward或者redirect的方式跳转例如：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##freemarker
+spring.freemarker.cache=false
+spring.freemarker.charset=UTF-8
+spring.freemarker.check-template-location=true
+spring.freemarker.content-type=text/html
+spring.freemarker.enabled=true
+spring.freemarker.suffix=.ftl
+spring.freemarker.template-loader-path=classpath:/templates
+</code></pre></div></div>
+<p>##Controller和ftl模板
+下一步我们就建一个基础Controller类和配套的ftl模板
+Controller类</p>
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">hw</span><span class="p">.</span><span class="n">myp2c</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">controller</span><span class="p">;</span>
 
+<span class="n">import</span> <span class="n">freemarker</span><span class="p">.</span><span class="n">template</span><span class="p">.</span><span class="n">Configuration</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">freemarker</span><span class="p">.</span><span class="n">template</span><span class="p">.</span><span class="n">Template</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">freemarker</span><span class="p">.</span><span class="n">template</span><span class="p">.</span><span class="n">TemplateException</span><span class="p">;</span>
 <span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">stereotype</span><span class="p">.</span><span class="n">Controller</span><span class="p">;</span>
 <span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">ui</span><span class="p">.</span><span class="k">Model</span><span class="p">;</span>
 <span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">bind</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">GetMapping</span><span class="p">;</span>
 <span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">bind</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">RequestMapping</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">javax</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">Resource</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">io</span><span class="p">.*;</span>
+<span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">net</span><span class="p">.</span><span class="n">URISyntaxException</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">HashMap</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">Map</span><span class="p">;</span>
 
 <span class="p">@</span><span class="n">Controller</span>
 <span class="p">@</span><span class="n">RequestMapping</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
@@ -165,12 +162,88 @@ spring.resources.static-locations=classpath:/static/,classpath:/js/,classpath:/c
 
     <span class="p">@</span><span class="n">GetMapping</span>
     <span class="k">public</span> <span class="k">String</span> <span class="n">main</span><span class="p">(</span><span class="k">Model</span> <span class="k">model</span><span class="p">){</span>
-        <span class="k">model</span><span class="p">.</span><span class="n">addAttribute</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span><span class="s2">"Welcome Thymeleaf!"</span><span class="p">);</span>
-        <span class="n">return</span> <span class="s2">"forward:/test.html"</span><span class="p">;</span>
+        <span class="k">String</span> <span class="n">w</span><span class="p">=</span><span class="s2">"Welcome FreeMarker!"</span><span class="p">;</span>
+        <span class="n">Map</span> <span class="n">root</span> <span class="p">=</span> <span class="n">new</span> <span class="n">HashMap</span><span class="p">();</span>
+        <span class="n">root</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span><span class="n">w</span><span class="p">);</span>
+        <span class="k">model</span><span class="p">.</span><span class="n">addAttribute</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span><span class="s2">"Welcome FreeMarker!"</span><span class="p">);</span>
+        <span class="n">return</span> <span class="s2">"test"</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
 </code></pre></div></div>
+<p>可以看到很简单，跟之前的thymelefa和jsp的没有区别。
+freemarker模板</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Welcome!<span class="nt">&lt;/title&gt;</span>
+    <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"/bootstrap.min.css"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/lib/jquery.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;h1&gt;</span>Hello ${w}!<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+<p>这样之后我们就能完成了基础freemarker的使用，更多的使用参见freemarker官方网站，这里不做过多的描述。
+这里我们已经完成了标准的freemarker集成，下面我们将介绍如何利用freemarker生成静态html页面，直接上代码，作为演示我们还是在Controller中完成，在实际应用中我们可以按照自己的实际需要进行封装。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">hw</span><span class="p">.</span><span class="n">myp2c</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">controller</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">freemarker</span><span class="p">.</span><span class="n">template</span><span class="p">.</span><span class="n">Configuration</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">freemarker</span><span class="p">.</span><span class="n">template</span><span class="p">.</span><span class="n">Template</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">freemarker</span><span class="p">.</span><span class="n">template</span><span class="p">.</span><span class="n">TemplateException</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">stereotype</span><span class="p">.</span><span class="n">Controller</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">ui</span><span class="p">.</span><span class="k">Model</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">bind</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">GetMapping</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">web</span><span class="p">.</span><span class="n">bind</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">RequestMapping</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">javax</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">Resource</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">io</span><span class="p">.*;</span>
+<span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">net</span><span class="p">.</span><span class="n">URISyntaxException</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">HashMap</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">Map</span><span class="p">;</span>
+
+<span class="p">@</span><span class="n">Controller</span>
+<span class="p">@</span><span class="n">RequestMapping</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+<span class="k">public</span> <span class="n">class</span> <span class="n">MainController</span> <span class="p">{</span>
+
+    <span class="p">@</span><span class="n">Resource</span>
+    <span class="n">Configuration</span> <span class="n">cfg</span><span class="p">;</span>
+
+    <span class="p">@</span><span class="n">GetMapping</span>
+    <span class="k">public</span> <span class="k">String</span> <span class="n">main</span><span class="p">(</span><span class="k">Model</span> <span class="k">model</span><span class="p">){</span>
+        <span class="k">String</span> <span class="n">w</span><span class="p">=</span><span class="s2">"Welcome FreeMarker!"</span><span class="p">;</span>
+        <span class="n">Map</span> <span class="n">root</span> <span class="p">=</span> <span class="n">new</span> <span class="n">HashMap</span><span class="p">();</span>
+        <span class="n">root</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span><span class="n">w</span><span class="p">);</span>
+        <span class="n">freeMarkerContent</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+        <span class="k">model</span><span class="p">.</span><span class="n">addAttribute</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span><span class="s2">"Welcome FreeMarker!"</span><span class="p">);</span>
+        <span class="n">return</span> <span class="s2">"test"</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">private</span> <span class="n">void</span> <span class="n">freeMarkerContent</span><span class="p">(</span><span class="n">Map</span><span class="p">&lt;</span><span class="k">String</span><span class="p">,</span><span class="n">Object</span><span class="p">&gt;</span> <span class="n">root</span><span class="p">){</span>
+        <span class="n">try</span> <span class="p">{</span>
+            <span class="n">Template</span> <span class="n">temp</span> <span class="p">=</span> <span class="n">cfg</span><span class="p">.</span><span class="n">getTemplate</span><span class="p">(</span><span class="s2">"test.ftl"</span><span class="p">);</span>
+            <span class="p">//</span><span class="err">以</span><span class="n">classpath</span><span class="err">下面的</span><span class="n">static</span><span class="err">目录作为静态页面的存储目录，同时命名生成的静态</span><span class="n">html</span><span class="err">文件名称</span>
+            <span class="k">String</span> <span class="n">path</span><span class="p">=</span><span class="n">this</span><span class="p">.</span><span class="nf">getClass</span><span class="p">().</span><span class="n">getResource</span><span class="p">(</span><span class="s2">"/"</span><span class="p">).</span><span class="n">toURI</span><span class="p">().</span><span class="n">getPath</span><span class="p">()+</span><span class="s2">"static/test.html"</span><span class="p">;</span>
+            <span class="n">Writer</span> <span class="n">file</span> <span class="p">=</span> <span class="n">new</span> <span class="n">FileWriter</span><span class="p">(</span><span class="n">new</span> <span class="n">File</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">substring</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s2">"/"</span><span class="p">))));</span>
+            <span class="n">temp</span><span class="p">.</span><span class="n">process</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">);</span>
+            <span class="n">file</span><span class="p">.</span><span class="n">flush</span><span class="p">();</span>
+            <span class="n">file</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+        <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">e</span><span class="p">.</span><span class="n">printStackTrace</span><span class="p">();</span>
+        <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">TemplateException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">e</span><span class="p">.</span><span class="n">printStackTrace</span><span class="p">();</span>
+        <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">URISyntaxException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">e</span><span class="p">.</span><span class="n">printStackTrace</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<p>利用freemarker生成静态页面我理解的流程是这样的
+1.利用Configuration读取想生成静态页面的模板，这里是test.ftl
+2.解析模板文件，并将模板中的${}!包含的参数替换成真实的数据
+3.最终将读取了真实数据的模板生成相应的html文件，并写入指定目录
+这样我们就完成了spring boot中使用freemarker模板，并且利用freemarker生成静态html文件</p>
   
 	</div>
 	<footer class="article-footer clearfix">
@@ -215,7 +288,7 @@ spring.resources.static-locations=classpath:/static/,classpath:/js/,classpath:/c
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://localhost:4000/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/" data-title="Spring Boot使用静态资源 | jackycheng86小站" data-tsina="" class="share clearfix">
+	  <div data-url="http://localhost:4000/spring/2017/10/21/Spring-Boot%E4%BD%BF%E7%94%A8freemarker%E5%B9%B6%E4%B8%94%E7%94%9F%E6%88%90%E9%9D%99%E6%80%81html%E9%A1%B5%E9%9D%A2/" data-title="Spring Boot使用freemarker并且生成静态html页面 | jackycheng86小站" data-tsina="" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -228,18 +301,18 @@ spring.resources.static-locations=classpath:/static/,classpath:/js/,classpath:/c
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/spring/2017/10/17/Spring-Boot-%E4%BD%BF%E7%94%A8Thymeleaf/" title="Spring Boot使用Thymeleaf">
+ <a href="/spring/2017/10/18/Spring-Boot%E4%BD%BF%E7%94%A8%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90/" title="Spring Boot使用静态资源">
   <strong>上一篇：</strong><br/>
   <span>
-  Spring Boot使用Thymeleaf</span>
+  Spring Boot使用静态资源</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/spring/2017/10/21/Spring-Boot%E4%BD%BF%E7%94%A8freemarker%E5%B9%B6%E4%B8%94%E7%94%9F%E6%88%90%E9%9D%99%E6%80%81html%E9%A1%B5%E9%9D%A2/"  title="Spring Boot使用freemarker并且生成静态html页面">
+<a href="/java/2017/11/05/%E5%90%91filter%E8%BF%87%E6%BB%A4%E5%99%A8%E4%B8%AD%E7%9A%84request%E5%AF%B9%E8%B1%A1%E6%B7%BB%E5%8A%A0%E9%A2%9D%E5%A4%96%E7%9A%84%E5%8F%82%E6%95%B0/"  title="向filter过滤器中的request对象添加额外的参数">
  <strong>下一篇：</strong><br/> 
- <span>Spring Boot使用freemarker并且生成静态html页面
+ <span>向filter过滤器中的request对象添加额外的参数
 </span>
 </a>
 </div>

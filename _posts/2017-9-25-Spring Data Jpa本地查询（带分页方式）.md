@@ -1,4 +1,13 @@
-#Spring Data Jpa本地查询（带分页方式）
+---
+title: Spring Data Jpa本地查询（带分页方式）
+date: 2017-9-25
+tags:
+- Spring Boot
+- Spring
+- Java
+categories: Spring
+---
+
 在利用spring data jpa开发的时候为了解决一些复杂的查询需求这时候我们需要引入本地查询nativeQuery
 参照官方的例子
 

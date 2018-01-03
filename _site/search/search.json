@@ -8,6 +8,22 @@
     
     
       {
+        "title": "Spring Data JPA 增删改查",
+        "date": "2017 年 07 月",
+        "excerpt": "Spring Data是Spring提供的对数据库的访问方式而Spring Data JPA是Spring Data的一部分，是JPA的Spring 实现方案。通过Spring Data JPA可以很方便的利用spring-framew构建基于数据库的应用程序。\nSpring Data JPA是JPA的spring实现因此包含了很多详细的应用方式，特别是各种类型的查询检索方式，本文只是简单的涉及数据库的增删改查也就是CRUD操作。\n\n  代码环境：maven+spring-boot\n\n\n",
+        
+        "url": "/spring/2017/07/26/Spring-Data-Jpa-%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/"
+      },
+    
+      {
+        "title": "Spring Data Jpa本地查询（带分页方式）",
+        "date": "2017 年 09 月",
+        "excerpt": "在利用spring data jpa开发的时候为了解决一些复杂的查询需求这时候我们需要引入本地查询nativeQuery\n参照官方的例子\n\n",
+        
+        "url": "/spring/2017/09/25/Spring-Data-Jpa%E6%9C%AC%E5%9C%B0%E6%9F%A5%E8%AF%A2-%E5%B8%A6%E5%88%86%E9%A1%B5%E6%96%B9%E5%BC%8F/"
+      },
+    
+      {
         "title": "Gentoo安装配置",
         "date": "2017 年 10 月",
         "excerpt": "Gentoo安装过程\n##（一) 磁盘准备\n1、硬盘分区\n通过cfdisk分区工具将硬盘进行分区操作，总计分为4个区如下所示\n\n  /deve/sda1\tefi 分区\n\n  /dev/sda2\tswap 分区\n\n  /dev/sda3\troot 分区\n\n  /dev/sda4\thome 分区\n\n\n",
@@ -24,6 +40,14 @@
       },
     
       {
+        "title": "Spring Boot使用Thymeleaf",
+        "date": "2017 年 10 月",
+        "excerpt": "之前给大家介绍了在spring boot开发中使用jsp模板，但是jsp目前并不是spring boot推荐的做法，同时使用jsp还有一些限制而Thymeleaf则是spring boot官方推荐的模板引擎。\n对于Thymeleaf我就不过多介绍网上资料很多，我们直接进入正题，在spring boot中使用Thymeleaf\n开发环境\n\n  spring boot  + Themeleaf 3\n\n\n先上pom.xml\n        &lt;!-- https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf --&gt;\n        &lt;dependency&gt;\n            &lt;groupId&gt;org.thymeleaf&lt;/groupId&gt;\n            &lt;artifactId&gt;thymeleaf&lt;/artifactId&gt;\n            &lt;version&gt;3.0.8.RELEASE&lt;/version&gt;\n        &lt;/dependency&gt;\n        &lt;!-- https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf-spring4 --&gt;\n        &lt;dependency&gt;\n            &lt;groupId&gt;org.thymeleaf&lt;/groupId&gt;\n            &lt;artifactId&gt;thymeleaf-spring4&lt;/artifactId&gt;\n            &lt;version&gt;3.0.8.RELEASE&lt;/version&gt;\n        &lt;/dependency&gt;\n\n\n我在这里并没有引入spring boot 官方的thymeleaf包\n&lt;dependency&gt;\n            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;\n            &lt;artifactId&gt;spring-boot-starter-thymeleaf&lt;/artifactId&gt;\n        &lt;/dependency&gt;\n\n\n而是引入Thymeleaf的包\n&lt;!-- https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf --&gt;\n        &lt;dependency&gt;\n            &lt;groupId&gt;org.thymeleaf&lt;/groupId&gt;\n            &lt;artifactId&gt;thymeleaf&lt;/artifactId&gt;\n            &lt;version&gt;3.0.8.RELEASE&lt;/version&gt;\n        &lt;/dependency&gt;\n        &lt;!-- https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf-spring4 --&gt;\n        &lt;dependency&gt;\n            &lt;groupId&gt;org.thymeleaf&lt;/groupId&gt;\n            &lt;artifactId&gt;thymeleaf-spring4&lt;/artifactId&gt;\n            &lt;version&gt;3.0.8.RELEASE&lt;/version&gt;\n        &lt;/dependency&gt;\n\n因为目前spring boot官方的依然引入的是thymeleaf 2.1.5这个版本的包而不是最新的3.0.8，而Thymeleaf 2 和Thymeleaf 3之间的差别比较大。\n\n引入好包之后我们就可以开始进行配置了，首先是spring boot的主类\npackage com.hw.myp2c;\n\nimport org.springframework.boot.SpringApplication;\nimport org.springframework.boot.autoconfigure.SpringBootApplication;\n\n@SpringBootApplication\npublic class Myp2cMainApplication {\n\n\tpublic static void main(String[] args) {\n\t\tSpringApplication.run(Myp2cMainApplication.class, args);\n\t}\n}\n\n\npackage com.hw.myp2c;\n\nimport org.springframework.boot.builder.SpringApplicationBuilder;\nimport org.springframework.boot.web.support.SpringBootServletInitializer;\n\npublic class ServletInitializer extends SpringBootServletInitializer {\n\n\t@Override\n\tprotected SpringApplicationBuilder configure(SpringApplicationBuilder application) {\n\t\treturn application.sources(Myp2cMainApplication.class);\n\t}\n\n}\n\n\n\n很简单的控制类\npackage com.hw.myp2c.common.controller;\n\nimport org.springframework.stereotype.Controller;\nimport org.springframework.ui.Model;\nimport org.springframework.web.bind.annotation.GetMapping;\nimport org.springframework.web.bind.annotation.RequestMapping;\n\n@Controller\n@RequestMapping(\"\")\npublic class MainController {\n\n    @GetMapping\n    public String main(Model model){\n        model.addAttribute(\"w\",\"Welcome Thymeleaf!\");\n        return \"main\";\n    }\n}\n\n\n然后是Thymeleaf的模板html文件，注意目录是在main下建立以下目录webapp/WEB-INF/templates，所有的html模板都放在templates下面供Thymeleaf引擎解析\n&lt;!DOCTYPE html&gt;\n&lt;html xmlns:th=\"http://www.thymeleaf.org\"&gt;\n\n&lt;head&gt;\n    &lt;title&gt;Good Thymes Virtual Grocery&lt;/title&gt;\n    &lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /&gt;\n&lt;/head&gt;\n\n&lt;body&gt;\n\n&lt;p th:text=\"'Hello, ' + ${w} + '!'\" /&gt;\n\n&lt;/body&gt;\n\n&lt;/html&gt;\n\n好了这是我们需要建立的各类文件，下面我们来做一些配置让spring boot识别并整合ThymeleafThymeleaf的配置有两种方法：\n\n  application.properties配置\njavabean配置\n\n\n两种方法各有优势，如果仅仅是想简单的使用Thymeleaf那就用第一种配置方法，如果想进行一些定制化的配置那就采用第二种方法\n首先我们介绍第一种配置方法，很简单就是在application.properties文件中添加如下内容就行了\n\n\n  spring.thymeleaf.cache=true\nspring.thymeleaf.check-template=true\nspring.thymeleaf.check-template-location=true\nspring.thymeleaf.enabled=true\nspring.thymeleaf.encoding=UTF-8\nspring.thymeleaf.mode=HTML\nspring.thymeleaf.prefix=/WEB-INF/templates/\nspring.thymeleaf.suffix=.html\n\n\n这样我们就配置好了直接执行mvn spring-boot:run测试运行结果\n\n  Hello, Welcome Thymeleaf!!\n\n\n下面我们介绍第二种配置方法，基于javabean的配置，首先我们创建一个类SpringWebConfig.class，在这个类里面完成Thymeleaf的配置\npackage com.hw.myp2c;\n\nimport org.springframework.beans.BeansException;\nimport org.springframework.context.ApplicationContext;\nimport org.springframework.context.ApplicationContextAware;\nimport org.springframework.context.annotation.Bean;\nimport org.springframework.context.annotation.ComponentScan;\nimport org.springframework.context.annotation.Configuration;\nimport org.springframework.context.support.ResourceBundleMessageSource;\nimport org.springframework.web.servlet.config.annotation.EnableWebMvc;\nimport org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;\nimport org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;\nimport org.thymeleaf.spring4.SpringTemplateEngine;\nimport org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;\nimport org.thymeleaf.spring4.view.ThymeleafViewResolver;\nimport org.thymeleaf.templatemode.TemplateMode;\n\n@Configuration\n@EnableWebMvc\n@ComponentScan\npublic class SpringWebConfig extends WebMvcConfigurerAdapter implements ApplicationContextAware{\n\n    private ApplicationContext applicationContext;\n\n\n    public SpringWebConfig() {\n        super();\n    }\n\n\n    public void setApplicationContext(final ApplicationContext applicationContext)\n            throws BeansException {\n        this.applicationContext = applicationContext;\n    }\n\n    /* ******************************************************************* */\n    /*  GENERAL CONFIGURATION ARTIFACTS                                    */\n    /*  Static Resources, i18n Messages, Formatters (Conversion Service)   */\n    /* ******************************************************************* */\n\n    @Override\n    public void addResourceHandlers(final ResourceHandlerRegistry registry) {\n        super.addResourceHandlers(registry);\n        registry.addResourceHandler(\"/images/**\").addResourceLocations(\"/images/\");\n        registry.addResourceHandler(\"/css/**\").addResourceLocations(\"/css/\");\n        registry.addResourceHandler(\"/js/**\").addResourceLocations(\"/js/\");\n    }\n\n    @Bean\n    public ResourceBundleMessageSource messageSource() {\n        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();\n        messageSource.setBasename(\"Messages\");\n        return messageSource;\n    }\n\n\n\n    @Bean\n    public SpringResourceTemplateResolver templateResolver(){\n        // SpringResourceTemplateResolver automatically integrates with Spring's own\n        // resource resolution infrastructure, which is highly recommended.\n        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();\n        templateResolver.setApplicationContext(this.applicationContext);\n        templateResolver.setPrefix(\"/WEB-INF/templates/\");\n        templateResolver.setSuffix(\".html\");\n        // HTML is the default value, added here for the sake of clarity.\n        templateResolver.setTemplateMode(TemplateMode.HTML);\n        // Template cache is true by default. Set to false if you want\n        // page to be automatically updated when modified.\n        templateResolver.setCacheable(true);\n        return templateResolver;\n    }\n\n    @Bean\n    public SpringTemplateEngine templateEngine(){\n        // SpringTemplateEngine automatically applies SpringStandardDialect and\n        // enables Spring's own MessageSource message resolution mechanisms.\n        SpringTemplateEngine templateEngine = new SpringTemplateEngine();\n        templateEngine.setTemplateResolver(templateResolver());\n        // Enabling the SpringEL compiler with Spring 4.2.4 or newer can\n        // speed up execution in most scenarios, but might be incompatible\n        // with specific cases when expressions in one template are reused\n        // across different data types, so this flag is \"false\" by default\n        // for safer backwards compatibility.\n        templateEngine.setEnableSpringELCompiler(false);\n        return templateEngine;\n    }\n\n    @Bean\n    public ThymeleafViewResolver viewResolver(){\n        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();\n        viewResolver.setTemplateEngine(templateEngine());\n        return viewResolver;\n    }\n\n}\n\n\n分别配置了对静态资源（js/css/images）的处理、templateResolver（模板解析器）、templateEngine（模板引擎）、viewResolver（视图解析器）\n",
+        
+        "url": "/spring/2017/10/17/Spring-Boot-%E4%BD%BF%E7%94%A8Thymeleaf/"
+      },
+    
+      {
         "title": "Spring Boot使用静态资源",
         "date": "2017 年 10 月",
         "excerpt": "在我们使用Spring boot进行web开发时都会遇到引入各类js、css、html、image等各种静态资源文件，这时候我们就需要进行相应的配置来允许应用访问这些静态资源。\n我们还是基于之前的采用thymeleaf 作为模板的 spring boot来开发\nSpring Boot使用Thymeleaf\n\n",
@@ -32,11 +56,27 @@
       },
     
       {
+        "title": "Spring Boot使用freemarker并且生成静态html页面",
+        "date": "2017 年 10 月",
+        "excerpt": "之前我介绍了在spring boot中使用thymeleaf模板，这次我会给大家介绍在spring boot中使用freemarker模板技术，同时利用freemarker生成静态html页面。生成静态html页面就能实现网站的静态化进而提高网站的访问速度以及提高SEO能力。\n首先在pom.xml中添加依赖\n##添加依赖\n&lt;dependency&gt;\n            &lt;groupId&gt;org.freemarker&lt;/groupId&gt;\n            &lt;artifactId&gt;freemarker&lt;/artifactId&gt;\n            &lt;version&gt;2.3.23&lt;/version&gt;\n        &lt;/dependency&gt;\n\n##application配置\n在application.properties中添加freemarker的配置参数\n\n",
+        
+        "url": "/spring/2017/10/21/Spring-Boot%E4%BD%BF%E7%94%A8freemarker%E5%B9%B6%E4%B8%94%E7%94%9F%E6%88%90%E9%9D%99%E6%80%81html%E9%A1%B5%E9%9D%A2/"
+      },
+    
+      {
         "title": "向filter过滤器中的request对象添加额外的参数",
         "date": "2017 年 11 月",
         "excerpt": "有时候我们会遇到这么一些需求，在filter中获取一些参数进行处理，同时将处理好的参数重新添加到request对象中，这时候我们在filter中直接使用request.setAttribute()是无效的。我们怎么来解决这个问题呢，j2ee已经给我们提供了解决的办法，使用HttpServletRequestWrapper类来解决向request添加额外参数的功能。\n\n  环境：spring boot\n\n\n",
         
         "url": "/java/2017/11/05/%E5%90%91filter%E8%BF%87%E6%BB%A4%E5%99%A8%E4%B8%AD%E7%9A%84request%E5%AF%B9%E8%B1%A1%E6%B7%BB%E5%8A%A0%E9%A2%9D%E5%A4%96%E7%9A%84%E5%8F%82%E6%95%B0/"
+      },
+    
+      {
+        "title": "Spring Boot 使用wangEditor实现图片上传",
+        "date": "2017 年 11 月",
+        "excerpt": "我们在进行web开发时经常会涉及到图片上传的问题，特别是利用富文本编辑器进行图片上传，业界也有很多的富文本编辑器，有ueditor、fckeditor、wangEditor。这里我们选择wangEditor作为示例，因为wangEditor是一个轻量级的富文本编辑器已经可以满足我们大部分的需求。这里结合spring boot实现图片上传，有了图片上传其实文件的上传也是一回事了。\n##wangEditor\n目前wangEditor已经时v3版本了，这里给出链接wangEditor，上面有详细的介绍。\n##spring boot\n我们依然采用spring boot作为服务端开发\n首先我们在resources目录添加了一个configure.properties文件里面只有一行，定义了我们上传文件存储的目录\n\n  ##用于存储系统中可能涉及到的各种配置信息\nmaterial.upload_dir=/home/jacky/upload-dir\n\n\n",
+        
+        "url": "/spring/2017/11/24/Spring-Boot-%E4%BD%BF%E7%94%A8wangEditor%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0/"
       },
     
       {

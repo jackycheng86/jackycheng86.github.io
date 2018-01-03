@@ -1,11 +1,20 @@
-#Spring Boot 使用wangEditor实现图片上传
+---
+title: Spring Boot 使用wangEditor实现图片上传
+date: 2017-11-24
+tags:
+- Spring Boot
+- Spring
+- Java
+categories: Spring
+---
+
 我们在进行web开发时经常会涉及到图片上传的问题，特别是利用富文本编辑器进行图片上传，业界也有很多的富文本编辑器，有ueditor、fckeditor、wangEditor。这里我们选择wangEditor作为示例，因为wangEditor是一个轻量级的富文本编辑器已经可以满足我们大部分的需求。这里结合spring boot实现图片上传，有了图片上传其实文件的上传也是一回事了。
-#wangEditor
+##wangEditor
 目前wangEditor已经时v3版本了，这里给出链接[wangEditor](https://www.kancloud.cn/wangfupeng/wangeditor3/332599)，上面有详细的介绍。
-#spring boot
+##spring boot
 我们依然采用spring boot作为服务端开发
 首先我们在resources目录添加了一个configure.properties文件里面只有一行，定义了我们上传文件存储的目录
->\#用于存储系统中可能涉及到的各种配置信息
+>\##用于存储系统中可能涉及到的各种配置信息
 >material.upload_dir=/home/jacky/upload-dir
 
 与之对应的我们构建一个类来加载配置文件

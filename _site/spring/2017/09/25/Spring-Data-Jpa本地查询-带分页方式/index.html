@@ -8,7 +8,7 @@
     
     
     
-    <title>Java 解析PDF内容 | jackycheng86小站</title>
+    <title>Spring Data Jpa本地查询（带分页方式） | jackycheng86小站</title>
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
@@ -23,12 +23,12 @@
     
     <meta property="og:type" content="article">
     
-    <meta property="og:title" content="Java 解析PDF内容">
-    <meta property="og:url" content="/java/2017/12/03/Java-%E8%A7%A3%E6%9E%90pdf%E5%86%85%E5%AE%B9/">
+    <meta property="og:title" content="Spring Data Jpa本地查询（带分页方式）">
+    <meta property="og:url" content="/spring/2017/09/25/Spring-Data-Jpa%E6%9C%AC%E5%9C%B0%E6%9F%A5%E8%AF%A2-%E5%B8%A6%E5%88%86%E9%A1%B5%E6%96%B9%E5%BC%8F/">
     <meta property="og:site_name" content="jackycheng86小站">
     <meta property="og:description" content="">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Java 解析PDF内容">
+    <meta name="twitter:title" content="Spring Data Jpa本地查询（带分页方式）">
     <meta name="twitter:description" content="page.description">
     <meta name="twitter:creator" content="@">
     <link rel="publisher" href="">
@@ -97,14 +97,14 @@
 	<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/java/2017/12/03/Java-%E8%A7%A3%E6%9E%90pdf%E5%86%85%E5%AE%B9/" title="Java 解析PDF内容" itemprop="url">Java 解析PDF内容</a>
+      <a href="/spring/2017/09/25/Spring-Data-Jpa%E6%9C%AC%E5%9C%B0%E6%9F%A5%E8%AF%A2-%E5%B8%A6%E5%88%86%E9%A1%B5%E6%96%B9%E5%BC%8F/" title="Spring Data Jpa本地查询（带分页方式）" itemprop="url">Spring Data Jpa本地查询（带分页方式）</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="jacky" target="_blank" itemprop="author">jacky</a>
 		
   <p class="article-time">
-    <time datetime="2017-12-03 00:00:00 +0800" itemprop="datePublished"> 发表于 2017-12-03</time>
+    <time datetime="2017-09-25 00:00:00 +0800" itemprop="datePublished"> 发表于 2017-09-25</time>
     
   </p>
 </header>
@@ -116,131 +116,54 @@
 		
 		</div>
 		
-		<p>最近遇到一个老师有点小需求，需要读取一些pdf的内容到数据库里面进行检索，因为一直都在合作所以找到了我。
-百度了一下发现在java下解决pdf内容解析的办法也有不少，我选了apache的pdfbox来做pdf的内容解析工作，<a href="https://pdfbox.apache.org/">pdfbox官网</a>
-开发环境</p>
+		<p>在利用spring data jpa开发的时候为了解决一些复杂的查询需求这时候我们需要引入本地查询nativeQuery
+参照官方的例子</p>
+
+<p>Native queries
+The @Query annotation allows to execute native queries by setting the nativeQuery flag to true.</p>
+
+<p>Example 50. Declare a native query at the query method using @Query</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+  @Query(value = "SELECT * FROM USERS WHERE EMAIL_ADDRESS = ?1", nativeQuery = true)
+  User findByEmailAddress(String emailAddress);
+  }
+</code></pre></div></div>
+<p>这是官方给出的使用本地查询的例子，但是也特别说明了目前本地查询并不支持动态排序，但是可以利用本地查询进行分页
+Note, that we currently don’t support execution of dynamic sorting for native queries as we’d have to manipulate the actual query declared and we cannot do this reliably for native SQL. You can however use native queries for pagination by specifying the count query yourself:
+这是官方给出的本地查询的分页形式</p>
+<font color="red">注意：如果你用这种方式在进行分页查询时是会报错的（测试数据库为Oracle，其他数据库暂未做测试）</font>
+<p>Example 51. Declare native count queries for pagination at the query method using @Query</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+  @Query(value = "SELECT * FROM USERS WHERE LASTNAME = ?1",
+    countQuery = "SELECT count(*) FROM USERS WHERE LASTNAME = ?1",
+    nativeQuery = true)
+  Page&lt;User&gt; findByLastname(String lastname, Pageable pageable);
+}
+</code></pre></div></div>
+<p>我的代码如下</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Query(value = "select * from secondleveldesc sd left join secondlevel s on s.code=sd.code ",
+            countQuery = "select count(*) from secondleveldesc",
+            nativeQuery = true)
+    Page&lt;SecondleveldescEntity&gt; findAll(Pageable pageable);
+</code></pre></div></div>
+<p>此时的错误信息如下</p>
 <blockquote>
-  <p>spring boot</p>
+  <p>Caused by: org.springframework.data.jpa.repository.query.InvalidJpaQueryMethodException: Cannot use native queries with dynamic sorting and/or pagination in method public abstract org.springframework.data.domain.Page com.material.cltx.dao.SecondlevelDescDao.findAll(org.springframework.data.domain.Pageable)</p>
 </blockquote>
 
-<p>先看pom.xml</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
-<span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
-	<span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="nt">&gt;</span>
-	<span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
-
-	<span class="nt">&lt;groupId&gt;</span>com.pdf<span class="nt">&lt;/groupId&gt;</span>
-	<span class="nt">&lt;artifactId&gt;</span>pdf<span class="nt">&lt;/artifactId&gt;</span>
-	<span class="nt">&lt;version&gt;</span>0.0.1-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
-	<span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
-
-	<span class="nt">&lt;name&gt;</span>pdf<span class="nt">&lt;/name&gt;</span>
-	<span class="nt">&lt;description&gt;</span>Demo project for Spring Boot<span class="nt">&lt;/description&gt;</span>
-
-	<span class="nt">&lt;parent&gt;</span>
-		<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-		<span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-parent<span class="nt">&lt;/artifactId&gt;</span>
-		<span class="nt">&lt;version&gt;</span>1.5.8.RELEASE<span class="nt">&lt;/version&gt;</span>
-		<span class="nt">&lt;relativePath/&gt;</span> <span class="c">&lt;!-- lookup parent from repository --&gt;</span>
-	<span class="nt">&lt;/parent&gt;</span>
-
-	<span class="nt">&lt;properties&gt;</span>
-		<span class="nt">&lt;project.build.sourceEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.build.sourceEncoding&gt;</span>
-		<span class="nt">&lt;project.reporting.outputEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.reporting.outputEncoding&gt;</span>
-		<span class="nt">&lt;java.version&gt;</span>1.8<span class="nt">&lt;/java.version&gt;</span>
-	<span class="nt">&lt;/properties&gt;</span>
-
-	<span class="nt">&lt;dependencies&gt;</span>
-		<span class="nt">&lt;dependency&gt;</span>
-			<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-			<span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="nt">&lt;/artifactId&gt;</span>
-		<span class="nt">&lt;/dependency&gt;</span>
-
-		<span class="nt">&lt;dependency&gt;</span>
-			<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-			<span class="nt">&lt;artifactId&gt;</span>spring-boot-devtools<span class="nt">&lt;/artifactId&gt;</span>
-			<span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
-		<span class="nt">&lt;/dependency&gt;</span>
-		<span class="nt">&lt;dependency&gt;</span>
-			<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-			<span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-test<span class="nt">&lt;/artifactId&gt;</span>
-			<span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
-		<span class="nt">&lt;/dependency&gt;</span>
-
-        <span class="nt">&lt;dependency&gt;</span>
-            <span class="nt">&lt;groupId&gt;</span>org.apache.pdfbox<span class="nt">&lt;/groupId&gt;</span>
-            <span class="nt">&lt;artifactId&gt;</span>pdfbox<span class="nt">&lt;/artifactId&gt;</span>
-            <span class="nt">&lt;version&gt;</span>2.0.4<span class="nt">&lt;/version&gt;</span>
-        <span class="nt">&lt;/dependency&gt;</span>
-        <span class="c">&lt;!-- https://mvnrepository.com/artifact/org.apache.pdfbox/fontbox --&gt;</span>
-        <span class="nt">&lt;dependency&gt;</span>
-            <span class="nt">&lt;groupId&gt;</span>org.apache.pdfbox<span class="nt">&lt;/groupId&gt;</span>
-            <span class="nt">&lt;artifactId&gt;</span>fontbox<span class="nt">&lt;/artifactId&gt;</span>
-            <span class="nt">&lt;version&gt;</span>2.0.8<span class="nt">&lt;/version&gt;</span>
-        <span class="nt">&lt;/dependency&gt;</span>
-
-    <span class="nt">&lt;/dependencies&gt;</span>
-
-	<span class="nt">&lt;build&gt;</span>
-		<span class="nt">&lt;plugins&gt;</span>
-			<span class="nt">&lt;plugin&gt;</span>
-				<span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-				<span class="nt">&lt;artifactId&gt;</span>spring-boot-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
-			<span class="nt">&lt;/plugin&gt;</span>
-		<span class="nt">&lt;/plugins&gt;</span>
-	<span class="nt">&lt;/build&gt;</span>
-
-
-<span class="nt">&lt;/project&gt;</span>
-
+<p>通过各种搜索最终找到一种解决办法</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    @Query(value = "select * from secondleveldesc sd left join secondlevel s on s.code=sd.code  ORDER BY ?#{#pageable}",countQuery = "select count(*) from secondleveldesc",nativeQuery = true)
+    Page&lt;SecondleveldescEntity&gt; findAll(Pageable pageable);
 </code></pre></div></div>
-<p>我做测试的是偶pdfbox最新版本为2.0.4现在可能有更新的版本，自己按照需要进行修改吧。
-我这里做的测试是从pdf解析出文本数据，然后再将解析出来的文本数据保存到一个txt文本，贴代码</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Test
-	public void pdfTest() {
-        try {
-            // 是否排序
-            boolean sort = false;
-            // 开始提取页数
-            int startPage = 1;
-            // 结束提取页数
-            int endPage = Integer.MAX_VALUE;
-            String content = null;
-            PrintWriter writer = null;
-            //pdf文本路径
-            String path = "/home/jacky/upload-dir/test.pdf";
-            //输出txt文本路径
-            String target="/home/jacky/upload-dir/test.txt";
-            PDDocument document = PDDocument.load(new File(path));
-            PDFTextStripper pts = new PDFTextStripper();
-            endPage = document.getNumberOfPages();
-            System.out.println("Total Page: " + endPage);
-            pts.setStartPage(startPage);
-            pts.setEndPage(endPage);
-            try {
-            	//content就是从pdf中解析出来的文本
-                content = pts.getText(document);
-                writer = new PrintWriter(new FileOutputStream(target));
-                writer.write(content);// 写入文件内容
-                writer.flush();
-                writer.close();
-            } catch (Exception e) {
-                throw e;
-            }finally {
-                if (null != document)
-                    document.close();
-            }
-            System.out.println("Get PDF Content ...");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-</code></pre></div></div>
-<p>这样我们就完成了一个简单的解析pdf文本的测试，但是请注意我这里示例的pdf保存的是文本类型的内容而不是图片形式的文本内容。我这里只是简单的介绍了一下pdfbox读取文本格式的内容，官方的svn代码提供了很多的demo，所以可以checkout一下官方的示例代码</p>
+
+<p>在查询语句后面加上</p>
 <blockquote>
-  <p>svn checkout http://svn.apache.org/repos/asf/pdfbox/trunk/examples</p>
+  <p>ORDER BY ?#{#pageable}”</p>
 </blockquote>
 
+<p>这样就能顺利的利用本地查询进行分页了</p>
   
 	</div>
 	<footer class="article-footer clearfix">
@@ -257,7 +180,7 @@
   }) %>
   -->
   
-  <a class="article-category-link" href="/categories/#Java">Java</a>
+  <a class="article-category-link" href="/categories/#Spring">Spring</a>
   
 </div>
 
@@ -271,6 +194,10 @@
   <span></span> <!--<%- tags.join('') %>-->
   
   
+  <a href="/tags/#Spring Boot">Spring Boot</a>
+  
+  <a href="/tags/#Spring">Spring</a>
+  
   <a href="/tags/#Java">Java</a>
   
   </div>
@@ -281,7 +208,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://localhost:4000/java/2017/12/03/Java-%E8%A7%A3%E6%9E%90pdf%E5%86%85%E5%AE%B9/" data-title="Java 解析PDF内容 | jackycheng86小站" data-tsina="" class="share clearfix">
+	  <div data-url="http://localhost:4000/spring/2017/09/25/Spring-Data-Jpa%E6%9C%AC%E5%9C%B0%E6%9F%A5%E8%AF%A2-%E5%B8%A6%E5%88%86%E9%A1%B5%E6%96%B9%E5%BC%8F/" data-title="Spring Data Jpa本地查询（带分页方式） | jackycheng86小站" data-tsina="" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -294,13 +221,21 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/spring/2017/11/24/Spring-Boot-%E4%BD%BF%E7%94%A8wangEditor%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0/" title="Spring Boot 使用wangEditor实现图片上传">
+ <a href="/spring/2017/07/26/Spring-Data-Jpa-%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/" title="Spring Data JPA 增删改查">
   <strong>上一篇：</strong><br/>
   <span>
-  Spring Boot 使用wangEditor实现图片上传</span>
+  Spring Data JPA 增删改查</span>
 </a>
 </div>
 
+
+<div class="next">
+<a href="/gentoo/2017/10/05/Gentoo%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/"  title="Gentoo安装配置">
+ <strong>下一篇：</strong><br/> 
+ <span>Gentoo安装配置
+</span>
+</a>
+</div>
 
 </nav>
 

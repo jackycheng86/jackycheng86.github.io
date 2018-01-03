@@ -1,4 +1,12 @@
-#Spring Boot使用freemarker并且生成静态html页面
+---
+title: Spring Boot使用freemarker并且生成静态html页面
+date: 2017-10-21
+tags:
+- Spring Boot
+- Spring
+- Java
+categories: Spring
+---
 之前我介绍了在spring boot中使用thymeleaf模板，这次我会给大家介绍在spring boot中使用freemarker模板技术，同时利用freemarker生成静态html页面。生成静态html页面就能实现网站的静态化进而提高网站的访问速度以及提高SEO能力。
 首先在pom.xml中添加依赖
 ##添加依赖

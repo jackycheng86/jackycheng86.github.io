@@ -1,4 +1,14 @@
-#Spring Data JPA 增删改查
+---
+title: Spring Data JPA 增删改查
+date: 2017-7-26
+tags:
+- Spring Boot
+- Spring
+- Java
+categories: Spring
+---
+
+
 Spring Data是Spring提供的对数据库的访问方式而Spring Data JPA是Spring Data的一部分，是JPA的Spring 实现方案。通过Spring Data JPA可以很方便的利用spring-framew构建基于数据库的应用程序。
 Spring Data JPA是JPA的spring实现因此包含了很多详细的应用方式，特别是各种类型的查询检索方式，本文只是简单的涉及数据库的增删改查也就是CRUD操作。
 >代码环境：maven+spring-boot
